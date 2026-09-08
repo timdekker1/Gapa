@@ -1,0 +1,1502 @@
+```html
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Collectie | Gapa Lederwaren</title>
+
+
+    <style>
+
+        /* =========================
+           ALGEMEEN
+        ========================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #ffffff;
+            color: #111111;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+
+            width: 100%;
+            min-height: 80px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 6%;
+
+            border-bottom: 1px solid #e5e5e5;
+
+            background-color: white;
+
+            position: sticky;
+            top: 0;
+
+            z-index: 100;
+
+        }
+
+
+        .logo {
+
+            font-size: 27px;
+
+            font-weight: 900;
+
+            letter-spacing: 3px;
+
+        }
+
+
+        .logo-small {
+
+            display: block;
+
+            font-size: 8px;
+
+            letter-spacing: 4px;
+
+            margin-top: 3px;
+
+        }
+
+
+        /* =========================
+           NAVIGATIE
+        ========================= */
+
+        nav {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 30px;
+
+        }
+
+
+        nav a {
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+        }
+
+
+        nav a:hover {
+
+            text-decoration: underline;
+
+        }
+
+
+        /* =========================
+           PAGINA TITEL
+        ========================= */
+
+        .page-header {
+
+            width: 90%;
+
+            max-width: 1250px;
+
+            margin: 0 auto;
+
+            padding: 65px 0 35px;
+
+        }
+
+
+        .small-title {
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            letter-spacing: 3px;
+
+            color: #777777;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .page-header h1 {
+
+            font-size: 55px;
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .page-header p {
+
+            color: #777777;
+
+            max-width: 650px;
+
+            line-height: 1.6;
+
+        }
+
+
+        /* =========================
+           FILTERS
+        ========================= */
+
+        .filter-section {
+
+            width: 90%;
+
+            max-width: 1250px;
+
+            margin: 0 auto 40px;
+
+        }
+
+
+        .filters {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+
+            padding: 20px;
+
+            background-color: #f5f5f5;
+
+            border: 1px solid #e2e2e2;
+
+        }
+
+
+        .search-box {
+
+            flex: 1;
+
+            min-width: 220px;
+
+        }
+
+
+        .search-box input {
+
+            width: 100%;
+
+            padding: 14px;
+
+            border: 1px solid #d5d5d5;
+
+            background-color: white;
+
+            font-size: 14px;
+
+            outline: none;
+
+        }
+
+
+        .filter {
+
+            padding: 14px;
+
+            border: 1px solid #d5d5d5;
+
+            background-color: white;
+
+            font-size: 14px;
+
+            min-width: 150px;
+
+            cursor: pointer;
+
+        }
+
+
+        .reset-button {
+
+            padding: 14px 20px;
+
+            border: none;
+
+            background-color: #111111;
+
+            color: white;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+        }
+
+
+        .reset-button:hover {
+
+            opacity: 0.8;
+
+        }
+
+
+        /* =========================
+           RESULTATEN
+        ========================= */
+
+        .result-info {
+
+            width: 90%;
+
+            max-width: 1250px;
+
+            margin: 0 auto 20px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+        }
+
+
+        .result-count {
+
+            color: #777777;
+
+            font-size: 13px;
+
+        }
+
+
+        .sort {
+
+            padding: 10px;
+
+            border: 1px solid #dddddd;
+
+            background: white;
+
+        }
+
+
+        /* =========================
+           PRODUCTEN
+        ========================= */
+
+        .products {
+
+            width: 90%;
+
+            max-width: 1250px;
+
+            margin: 0 auto 80px;
+
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 25px;
+
+        }
+
+
+        .product {
+
+            border: 1px solid #e2e2e2;
+
+            background-color: white;
+
+            transition: 0.2s;
+
+        }
+
+
+        .product:hover {
+
+            transform: translateY(-4px);
+
+        }
+
+
+        .product-image {
+
+            height: 350px;
+
+            background-color: #f3f3f3;
+
+            position: relative;
+
+            overflow: hidden;
+
+        }
+
+
+        .product-image img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+        }
+
+
+        .new-label {
+
+            position: absolute;
+
+            top: 15px;
+
+            left: 15px;
+
+            background-color: #111111;
+
+            color: white;
+
+            padding: 8px 10px;
+
+            font-size: 10px;
+
+            font-weight: bold;
+
+            letter-spacing: 1px;
+
+        }
+
+
+        .product-info {
+
+            padding: 20px;
+
+        }
+
+
+        .product-name {
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .product-description {
+
+            color: #777777;
+
+            font-size: 13px;
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .product-price {
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+        }
+
+
+        .stock {
+
+            margin-top: 10px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+        }
+
+
+        .stock-good {
+
+            color: #26733b;
+
+        }
+
+
+        .stock-low {
+
+            color: #a56a00;
+
+        }
+
+
+        .stock-none {
+
+            color: #a00000;
+
+        }
+
+
+        /* =========================
+           GEEN RESULTATEN
+        ========================= */
+
+        .no-results {
+
+            width: 90%;
+
+            max-width: 1250px;
+
+            margin: 0 auto 80px;
+
+            padding: 80px 20px;
+
+            text-align: center;
+
+            background-color: #f5f5f5;
+
+            display: none;
+
+        }
+
+
+        .no-results h2 {
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .no-results p {
+
+            color: #777777;
+
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+
+            border-top: 1px solid #e5e5e5;
+
+            padding: 35px 6%;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            color: #777777;
+
+            font-size: 13px;
+
+        }
+
+
+        /* =========================
+           TABLET
+        ========================= */
+
+        @media (max-width: 900px) {
+
+            .products {
+
+                grid-template-columns: repeat(2, 1fr);
+
+            }
+
+
+            .page-header h1 {
+
+                font-size: 45px;
+
+            }
+
+        }
+
+
+        /* =========================
+           MOBIEL
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            header {
+
+                padding: 20px 5%;
+
+                flex-direction: column;
+
+                gap: 20px;
+
+            }
+
+
+            nav {
+
+                gap: 18px;
+
+                flex-wrap: wrap;
+
+                justify-content: center;
+
+            }
+
+
+            .page-header {
+
+                width: 94%;
+
+                padding-top: 45px;
+
+            }
+
+
+            .page-header h1 {
+
+                font-size: 38px;
+
+            }
+
+
+            .filter-section {
+
+                width: 94%;
+
+            }
+
+
+            .filters {
+
+                flex-direction: column;
+
+                align-items: stretch;
+
+            }
+
+
+            .search-box {
+
+                width: 100%;
+
+            }
+
+
+            .filter {
+
+                width: 100%;
+
+            }
+
+
+            .reset-button {
+
+                width: 100%;
+
+            }
+
+
+            .result-info {
+
+                width: 94%;
+
+                flex-direction: column;
+
+                align-items: start;
+
+                gap: 15px;
+
+            }
+
+
+            .products {
+
+                width: 94%;
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .product-image {
+
+                height: 350px;
+
+            }
+
+
+            footer {
+
+                flex-direction: column;
+
+                gap: 10px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header>
+
+
+        <a href="../index.html">
+
+            <div class="logo">
+
+                GAPA
+
+                <span class="logo-small">
+                    LEDERWAREN
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <nav>
+
+            <a href="../index.html">
+                Home
+            </a>
+
+            <a href="collectie.html">
+                Collectie
+            </a>
+
+            <a href="#">
+                Matcher
+            </a>
+
+            <a href="#">
+                Inloggen
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- =========================
+         PAGINA TITEL
+    ========================= -->
+
+    <section class="page-header">
+
+        <div class="small-title">
+            GAPA LEDERWAREN · SCHAGEN
+        </div>
+
+        <h1>
+            Onze collectie
+        </h1>
+
+        <p>
+            Bekijk alle tassen, accessoires en lederwaren
+            uit onze collectie. Gebruik de filters om snel
+            te vinden wat je zoekt.
+        </p>
+
+    </section>
+
+
+
+    <!-- =========================
+         FILTERS
+    ========================= -->
+
+    <section class="filter-section">
+
+
+        <div class="filters">
+
+
+            <!-- ZOEKEN -->
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Zoek naar een product..."
+                    onkeyup="filterProducts()">
+
+            </div>
+
+
+            <!-- CATEGORIE -->
+
+            <select
+                id="categoryFilter"
+                class="filter"
+                onchange="filterProducts()">
+
+                <option value="all">
+                    Alle categorieën
+                </option>
+
+                <option value="tas">
+                    Tassen
+                </option>
+
+                <option value="rugzak">
+                    Rugzakken
+                </option>
+
+                <option value="accessoire">
+                    Accessoires
+                </option>
+
+                <option value="reis">
+                    Reisartikelen
+                </option>
+
+            </select>
+
+
+            <!-- KLEUR -->
+
+            <select
+                id="colorFilter"
+                class="filter"
+                onchange="filterProducts()">
+
+                <option value="all">
+                    Alle kleuren
+                </option>
+
+                <option value="zwart">
+                    Zwart
+                </option>
+
+                <option value="bruin">
+                    Bruin
+                </option>
+
+                <option value="rood">
+                    Rood
+                </option>
+
+                <option value="blauw">
+                    Blauw
+                </option>
+
+                <option value="groen">
+                    Groen
+                </option>
+
+            </select>
+
+
+            <!-- SORTEREN -->
+
+            <select
+                id="sortFilter"
+                class="filter"
+                onchange="sortProducts()">
+
+                <option value="default">
+                    Standaard
+                </option>
+
+                <option value="price-low">
+                    Prijs: laag → hoog
+                </option>
+
+                <option value="price-high">
+                    Prijs: hoog → laag
+                </option>
+
+                <option value="name">
+                    Naam A → Z
+                </option>
+
+            </select>
+
+
+            <!-- RESET -->
+
+            <button
+                class="reset-button"
+                onclick="resetFilters()">
+
+                Filters wissen
+
+            </button>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         RESULTAAT INFO
+    ========================= -->
+
+    <div class="result-info">
+
+        <div
+            class="result-count"
+            id="resultCount">
+
+            6 artikelen gevonden
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         PRODUCTEN
+    ========================= -->
+
+    <section
+        class="products"
+        id="productContainer">
+
+
+        <!-- =====================
+             PRODUCT 1
+        ====================== -->
+
+        <article
+            class="product"
+            data-name="Gekleurde schoudertas"
+            data-category="tas"
+            data-color="rood"
+            data-price="59.95">
+
+
+            <div class="product-image">
+
+                <span class="new-label">
+                    NIEUW
+                </span>
+
+                <img
+                    src="images/product1.jpg"
+                    alt="Gekleurde schoudertas">
+
+            </div>
+
+
+            <div class="product-info">
+
+                <h3 class="product-name">
+                    Gekleurde schoudertas
+                </h3>
+
+                <p class="product-description">
+                    Tas · Rood · Casual
+                </p>
+
+                <div class="product-price">
+                    € 59,95
+                </div>
+
+                <div class="stock stock-good">
+                    ● Op voorraad: 8
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =====================
+             PRODUCT 2
+        ====================== -->
+
+        <article
+            class="product"
+            data-name="Leren handtas"
+            data-category="tas"
+            data-color="zwart"
+            data-price="89.95">
+
+
+            <div class="product-image">
+
+                <span class="new-label">
+                    NIEUW
+                </span>
+
+                <img
+                    src="images/product2.jpg"
+                    alt="Leren handtas">
+
+            </div>
+
+
+            <div class="product-info">
+
+                <h3 class="product-name">
+                    Leren handtas
+                </h3>
+
+                <p class="product-description">
+                    Tas · Zwart · Elegant
+                </p>
+
+                <div class="product-price">
+                    € 89,95
+                </div>
+
+                <div class="stock stock-low">
+                    ● Bijna uitverkocht: 4
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =====================
+             PRODUCT 3
+        ====================== -->
+
+        <article
+            class="product"
+            data-name="Reistas compact"
+            data-category="reis"
+            data-color="blauw"
+            data-price="74.95">
+
+
+            <div class="product-image">
+
+                <img
+                    src="images/product3.jpg"
+                    alt="Reistas compact">
+
+            </div>
+
+
+            <div class="product-info">
+
+                <h3 class="product-name">
+                    Reistas compact
+                </h3>
+
+                <p class="product-description">
+                    Reisartikel · Blauw · Travel
+                </p>
+
+                <div class="product-price">
+                    € 74,95
+                </div>
+
+                <div class="stock stock-good">
+                    ● Op voorraad: 12
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =====================
+             PRODUCT 4
+        ====================== -->
+
+        <article
+            class="product"
+            data-name="Leren portemonnee"
+            data-category="accessoire"
+            data-color="bruin"
+            data-price="34.95">
+
+
+            <div class="product-image">
+
+                <img
+                    src="images/product4.jpg"
+                    alt="Leren portemonnee">
+
+            </div>
+
+
+            <div class="product-info">
+
+                <h3 class="product-name">
+                    Leren portemonnee
+                </h3>
+
+                <p class="product-description">
+                    Accessoire · Bruin · Classic
+                </p>
+
+                <div class="product-price">
+                    € 34,95
+                </div>
+
+                <div class="stock stock-good">
+                    ● Op voorraad: 15
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =====================
+             PRODUCT 5
+        ====================== -->
+
+        <article
+            class="product"
+            data-name="Crossbody tas"
+            data-category="tas"
+            data-color="groen"
+            data-price="64.95">
+
+
+            <div class="product-image">
+
+                <span class="new-label">
+                    NIEUW
+                </span>
+
+                <img
+                    src="images/product5.jpg"
+                    alt="Crossbody tas">
+
+            </div>
+
+
+            <div class="product-info">
+
+                <h3 class="product-name">
+                    Crossbody tas
+                </h3>
+
+                <p class="product-description">
+                    Tas · Groen · Casual
+                </p>
+
+                <div class="product-price">
+                    € 64,95
+                </div>
+
+                <div class="stock stock-good">
+                    ● Op voorraad: 6
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =====================
+             PRODUCT 6
+        ====================== -->
+
+        <article
+            class="product"
+            data-name="Laptop rugzak"
+            data-category="rugzak"
+            data-color="zwart"
+            data-price="79.95">
+
+
+            <div class="product-image">
+
+                <img
+                    src="images/product6.jpg"
+                    alt="Laptop rugzak">
+
+            </div>
+
+
+            <div class="product-info">
+
+                <h3 class="product-name">
+                    Laptop rugzak
+                </h3>
+
+                <p class="product-description">
+                    Rugzak · Zwart · Business
+                </p>
+
+                <div class="product-price">
+                    € 79,95
+                </div>
+
+                <div class="stock stock-low">
+                    ● Bijna uitverkocht: 3
+                </div>
+
+            </div>
+
+        </article>
+
+
+    </section>
+
+
+
+    <!-- =========================
+         GEEN RESULTATEN
+    ========================= -->
+
+    <div
+        class="no-results"
+        id="noResults">
+
+        <h2>
+            Geen artikelen gevonden
+        </h2>
+
+        <p>
+            Probeer een andere zoekterm of pas je filters aan.
+        </p>
+
+    </div>
+
+
+
+    <!-- =========================
+         FOOTER
+    ========================= -->
+
+    <footer>
+
+        <div>
+            <strong>GAPA Lederwaren</strong>
+        </div>
+
+        <div>
+            Makado · Schagen
+        </div>
+
+        <div>
+            © 2026 Gapa Lederwaren
+        </div>
+
+    </footer>
+
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================= -->
+
+    <script>
+
+
+        /* =========================
+           PRODUCTEN FILTEREN
+        ========================= */
+
+        function filterProducts() {
+
+
+            // Zoekwaarde ophalen
+
+            let search =
+                document
+                .getElementById("searchInput")
+                .value
+                .toLowerCase();
+
+
+            // Categorie ophalen
+
+            let category =
+                document
+                .getElementById("categoryFilter")
+                .value;
+
+
+            // Kleur ophalen
+
+            let color =
+                document
+                .getElementById("colorFilter")
+                .value;
+
+
+            // Alle producten ophalen
+
+            let products =
+                document.querySelectorAll(".product");
+
+
+            let visibleProducts = 0;
+
+
+            // Door alle producten lopen
+
+            products.forEach(function(product) {
+
+
+                let name =
+                    product
+                    .getAttribute("data-name")
+                    .toLowerCase();
+
+
+                let productCategory =
+                    product
+                    .getAttribute("data-category");
+
+
+                let productColor =
+                    product
+                    .getAttribute("data-color");
+
+
+                // Controleren
+
+                let matchesSearch =
+                    name.includes(search);
+
+
+                let matchesCategory =
+                    category === "all" ||
+                    productCategory === category;
+
+
+                let matchesColor =
+                    color === "all" ||
+                    productColor === color;
+
+
+                // Product tonen/verbergen
+
+                if (
+                    matchesSearch &&
+                    matchesCategory &&
+                    matchesColor
+                ) {
+
+                    product.style.display = "";
+
+                    visibleProducts++;
+
+                } else {
+
+                    product.style.display = "none";
+
+                }
+
+            });
+
+
+            // Aantal aanpassen
+
+            document
+                .getElementById("resultCount")
+                .innerText =
+                visibleProducts +
+                " artikelen gevonden";
+
+
+            // Geen resultaten
+
+            if (visibleProducts === 0) {
+
+                document
+                    .getElementById("noResults")
+                    .style.display = "block";
+
+            } else {
+
+                document
+                    .getElementById("noResults")
+                    .style.display = "none";
+
+            }
+
+        }
+
+
+
+        /* =========================
+           SORTEREN
+        ========================= */
+
+        function sortProducts() {
+
+
+            let sort =
+                document
+                .getElementById("sortFilter")
+                .value;
+
+
+            let container =
+                document
+                .getElementById("productContainer");
+
+
+            let products =
+                Array.from(
+                    container.querySelectorAll(".product")
+                );
+
+
+            if (sort === "price-low") {
+
+                products.sort(function(a, b) {
+
+                    return (
+                        parseFloat(
+                            a.dataset.price
+                        )
+                        -
+                        parseFloat(
+                            b.dataset.price
+                        )
+                    );
+
+                });
+
+            }
+
+
+            else if (sort === "price-high") {
+
+                products.sort(function(a, b) {
+
+                    return (
+                        parseFloat(
+                            b.dataset.price
+                        )
+                        -
+                        parseFloat(
+                            a.dataset.price
+                        )
+                    );
+
+                });
+
+            }
+
+
+            else if (sort === "name") {
+
+                products.sort(function(a, b) {
+
+                    return a.dataset.name
+                        .localeCompare(
+                            b.dataset.name
+                        );
+
+                });
+
+            }
+
+
+            // Producten opnieuw plaatsen
+
+            products.forEach(function(product) {
+
+                container.appendChild(product);
+
+            });
+
+        }
+
+
+
+        /* =========================
+           FILTERS RESETTEN
+        ========================= */
+
+        function resetFilters() {
+
+
+            document
+                .getElementById("searchInput")
+                .value = "";
+
+
+            document
+                .getElementById("categoryFilter")
+                .value = "all";
+
+
+            document
+                .getElementById("colorFilter")
+                .value = "all";
+
+
+            document
+                .getElementById("sortFilter")
+                .value = "default";
+
+
+            filterProducts();
+
+            sortProducts();
+
+        }
+
+
+        console.log(
+            "Gapa collectiepagina geladen."
+        );
+
+
+    </script>
+
+
+</body>
+
+</html>
+```
