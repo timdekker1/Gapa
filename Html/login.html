@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+
+<html lang="nl">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+<title>Inloggen | Gapa Lederwaren</title>
+
+<style>
+
+    /* =========================
+       ALGEMEEN
+    ========================= */
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #ffffff;
+        color: #111111;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    header {
+
+        width: 100%;
+        min-height: 80px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 0 6%;
+
+        border-bottom: 1px solid #e5e5e5;
+
+        background-color: white;
+
+        position: sticky;
+        top: 0;
+
+        z-index: 100;
+    }
+
+
+    /* =========================
+       LOGO
+    ========================= */
+
+    .logo {
+
+        font-size: 27px;
+        font-weight: 900;
+
+        letter-spacing: 3px;
+    }
+
+    .logo-small {
+
+        display: block;
+
+        font-size: 8px;
+
+        letter-spacing: 4px;
+
+        margin-top: 3px;
+    }
+
+
+    /* =========================
+       NAVIGATIE
+    ========================= */
+
+    nav {
+
+        display: flex;
+        align-items: center;
+
+        gap: 30px;
+    }
+
+    nav a {
+
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    nav a:hover {
+
+        text-decoration: underline;
+    }
+
+    nav .active {
+
+        text-decoration: underline;
+    }
+
+
+    /* =========================
+       LOGIN PAGINA
+    ========================= */
+
+    .login-page {
+
+        width: 90%;
+        max-width: 1250px;
+
+        margin: 0 auto;
+
+        flex: 1;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        padding: 70px 0;
+    }
+
+
+    /* =========================
+       LOGIN CONTAINER
+    ========================= */
+
+    .login-container {
+
+        width: 100%;
+        max-width: 480px;
+
+        border: 1px solid #e2e2e2;
+
+        background-color: white;
+
+        padding: 45px;
+    }
+
+
+    /* =========================
+       LOGIN TITEL
+    ========================= */
+
+    .login-header {
+
+        margin-bottom: 35px;
+    }
+
+    .small-title {
+
+        font-size: 11px;
+
+        font-weight: bold;
+
+        letter-spacing: 3px;
+
+        color: #777777;
+
+        margin-bottom: 10px;
+    }
+
+    .login-header h1 {
+
+        font-size: 42px;
+
+        margin-bottom: 12px;
+    }
+
+    .login-header p {
+
+        color: #777777;
+
+        font-size: 14px;
+
+        line-height: 1.6;
+    }
+
+
+    /* =========================
+       FORMULIER
+    ========================= */
+
+    .login-form {
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 20px;
+    }
+
+
+    /* =========================
+       FORMULIER VELDEN
+    ========================= */
+
+    .form-group {
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+    .form-group label {
+
+        font-size: 13px;
+
+        font-weight: bold;
+    }
+
+    .form-group input {
+
+        width: 100%;
+
+        padding: 15px;
+
+        border: 1px solid #d5d5d5;
+
+        background-color: #ffffff;
+
+        font-size: 14px;
+
+        outline: none;
+
+        transition: 0.2s;
+    }
+
+    .form-group input:focus {
+
+        border-color: #111111;
+    }
+
+
+    /* =========================
+       WACHTWOORD OPTIES
+    ========================= */
+
+    .password-options {
+
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        margin-top: -5px;
+    }
+
+    .remember {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        font-size: 12px;
+
+        color: #555555;
+    }
+
+    .remember input {
+
+        cursor: pointer;
+    }
+
+    .forgot-password {
+
+        font-size: 12px;
+
+        color: #111111;
+
+        font-weight: bold;
+    }
+
+    .forgot-password:hover {
+
+        text-decoration: underline;
+    }
+
+
+    /* =========================
+       LOGIN KNOP
+    ========================= */
+
+    .login-button {
+
+        width: 100%;
+
+        padding: 16px;
+
+        border: none;
+
+        background-color: #111111;
+
+        color: white;
+
+        font-size: 14px;
+
+        font-weight: bold;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+
+        margin-top: 5px;
+    }
+
+    .login-button:hover {
+
+        opacity: 0.8;
+    }
+
+
+    /* =========================
+       FOUTMELDING
+    ========================= */
+
+    .error-message {
+
+        display: none;
+
+        padding: 12px;
+
+        background-color: #f5f5f5;
+
+        border-left: 3px solid #a00000;
+
+        color: #a00000;
+
+        font-size: 12px;
+
+        line-height: 1.5;
+    }
+
+
+    /* =========================
+       REGISTREREN
+    ========================= */
+
+    .register-section {
+
+        margin-top: 30px;
+
+        padding-top: 25px;
+
+        border-top: 1px solid #e5e5e5;
+
+        text-align: center;
+    }
+
+    .register-section p {
+
+        font-size: 13px;
+
+        color: #777777;
+
+        margin-bottom: 10px;
+    }
+
+    .register-link {
+
+        font-size: 13px;
+
+        font-weight: bold;
+    }
+
+    .register-link:hover {
+
+        text-decoration: underline;
+    }
+
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    footer {
+
+        border-top: 1px solid #e5e5e5;
+
+        padding: 35px 6%;
+
+        display: flex;
+
+        justify-content: space-between;
+
+        color: #777777;
+
+        font-size: 13px;
+    }
+
+
+    /* =========================
+       TABLET
+    ========================= */
+
+    @media (max-width: 900px) {
+
+        .login-container {
+
+            max-width: 500px;
+        }
+
+    }
+
+
+    /* =========================
+       MOBIEL
+    ========================= */
+
+    @media (max-width: 600px) {
+
+        header {
+
+            padding: 20px 5%;
+
+            flex-direction: column;
+
+            gap: 20px;
+        }
+
+        nav {
+
+            gap: 18px;
+
+            flex-wrap: wrap;
+
+            justify-content: center;
+        }
+
+        .login-page {
+
+            width: 94%;
+
+            padding: 45px 0;
+        }
+
+        .login-container {
+
+            padding: 30px 25px;
+        }
+
+        .login-header h1 {
+
+            font-size: 35px;
+        }
+
+        .password-options {
+
+            flex-direction: column;
+
+            align-items: flex-start;
+
+            gap: 12px;
+        }
+
+        footer {
+
+            flex-direction: column;
+
+            gap: 10px;
+        }
+
+    }
+
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<!-- =========================
+     HEADER
+========================= -->
+
+<header>
+
+    <a href="../index.html">
+
+        <div class="logo">
+
+            GAPA
+
+            <span class="logo-small">
+                LEDERWAREN
+            </span>
+
+        </div>
+
+    </a>
+
+
+    <!-- =========================
+         NAVIGATIE
+    ========================= -->
+
+    <nav>
+
+        <a href="../index.html">
+            Home
+        </a>
+
+        <a href="collectie.html">
+            Collectie
+        </a>
+
+        <a href="matcher.html">
+            Matcher
+        </a>
+
+        <a
+            href="login.html"
+            class="active">
+
+            Inloggen
+
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<!-- =========================
+     LOGIN PAGINA
+========================= -->
+
+<main class="login-page">
+
+
+    <!-- =========================
+         LOGIN CONTAINER
+    ========================= -->
+
+    <section class="login-container">
+
+
+        <!-- =========================
+             TITEL
+        ========================= -->
+
+        <div class="login-header">
+
+            <div class="small-title">
+                GAPA LEDERWAREN · ACCOUNT
+            </div>
+
+            <h1>
+                Inloggen
+            </h1>
+
+            <p>
+                Log in op je account om je gegevens,
+                bestellingen en persoonlijke voorkeuren
+                te bekijken.
+            </p>
+
+        </div>
+
+
+
+        <!-- =========================
+             LOGIN FORMULIER
+        ========================= -->
+
+        <form
+            class="login-form"
+            id="loginForm">
+
+
+            <!-- E-MAIL -->
+
+            <div class="form-group">
+
+                <label for="email">
+                    E-mailadres
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Vul je e-mailadres in"
+                    autocomplete="email"
+                    required>
+
+            </div>
+
+
+            <!-- WACHTWOORD -->
+
+            <div class="form-group">
+
+                <label for="password">
+                    Wachtwoord
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Vul je wachtwoord in"
+                    autocomplete="current-password"
+                    required>
+
+            </div>
+
+
+
+            <!-- =========================
+                 OPTIES
+            ========================= -->
+
+            <div class="password-options">
+
+                <label class="remember">
+
+                    <input
+                        type="checkbox"
+                        id="remember">
+
+                    <span>
+                        Ingelogd blijven
+                    </span>
+
+                </label>
+
+
+                <a
+                    href="#"
+                    class="forgot-password">
+
+                    Wachtwoord vergeten?
+
+                </a>
+
+            </div>
+
+
+
+            <!-- =========================
+                 FOUTMELDING
+            ========================= -->
+
+            <div
+                class="error-message"
+                id="errorMessage">
+
+                Het e-mailadres of wachtwoord
+                is niet correct.
+
+            </div>
+
+
+
+            <!-- =========================
+                 LOGIN KNOP
+            ========================= -->
+
+            <button
+                type="submit"
+                class="login-button">
+
+                Inloggen
+
+            </button>
+
+        </form>
+
+
+
+        <!-- =========================
+             REGISTREREN
+        ========================= -->
+
+        <div class="register-section">
+
+            <p>
+                Nog geen account?
+            </p>
+
+            <a
+                href="#"
+                class="register-link">
+
+                Account aanmaken →
+
+            </a>
+
+        </div>
+
+
+    </section>
+
+</main>
+
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+
+    <div>
+        <strong>
+            GAPA Lederwaren
+        </strong>
+    </div>
+
+    <div>
+        Makado · Schagen
+    </div>
+
+    <div>
+        © 2026 Gapa Lederwaren
+    </div>
+
+</footer>
+
+
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
+<script>
+
+    /* =========================
+       LOGIN FORMULIER
+    ========================= */
+
+    document
+        .getElementById("loginForm")
+        .addEventListener("submit", function(event) {
+
+            /*
+                Voorkomt dat de pagina
+                automatisch opnieuw laadt.
+
+                De backend kan dit later
+                overnemen.
+            */
+
+            event.preventDefault();
+
+
+            /* Gegevens ophalen */
+
+            const email =
+                document
+                    .getElementById("email")
+                    .value;
+
+            const password =
+                document
+                    .getElementById("password")
+                    .value;
+
+
+            console.log(
+                "Login geprobeerd:",
+                email
+            );
+
+
+            /*
+                HIER KAN JULLIE BACKEND
+                LATER AAN GEKOPPELD WORDEN.
+
+                Bijvoorbeeld:
+
+                fetch("/api/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+            */
+
+
+            console.log(
+                "Frontend login klaar voor backend."
+            );
+
+        });
+
+
+    /* =========================
+       WACHTWOORD VERGETEN
+    ========================= */
+
+    document
+        .querySelector(".forgot-password")
+        .addEventListener("click", function(event) {
+
+            event.preventDefault();
+
+            alert(
+                "De functie 'Wachtwoord vergeten' kan later aan de backend worden gekoppeld."
+            );
+
+        });
+
+</script>
+```
+
+</body>
+
+</html>
