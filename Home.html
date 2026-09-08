@@ -1,0 +1,855 @@
+```html
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gapa Lederwaren | Schagen</title>
+
+    <style>
+
+        /* =========================
+           ALGEMEEN
+        ========================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #ffffff;
+            color: #111111;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            width: 100%;
+            height: 80px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 6%;
+
+            border-bottom: 1px solid #e5e5e5;
+            background-color: white;
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+
+        /* LOGO */
+
+        .logo {
+            font-size: 27px;
+            font-weight: 900;
+            letter-spacing: 3px;
+        }
+
+        .logo-small {
+            display: block;
+            font-size: 8px;
+            letter-spacing: 4px;
+            margin-top: 3px;
+        }
+
+
+        /* NAVIGATIE */
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        nav a {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+            min-height: 600px;
+
+            margin: 25px 5% 70px;
+
+            background-image:
+                linear-gradient(
+                    90deg,
+                    rgba(0, 0, 0, 0.75),
+                    rgba(0, 0, 0, 0.10)
+                ),
+                url("images/hero.jpg");
+
+            background-size: cover;
+            background-position: center;
+
+            display: flex;
+            align-items: center;
+
+            padding: 60px;
+        }
+
+        .hero-content {
+            color: white;
+            max-width: 650px;
+        }
+
+        .hero-small {
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 {
+            font-size: 65px;
+            line-height: 1;
+            margin-bottom: 25px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            line-height: 1.6;
+            max-width: 550px;
+            margin-bottom: 25px;
+        }
+
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        .button {
+            display: inline-block;
+
+            padding: 15px 25px;
+
+            border: none;
+
+            font-size: 14px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .button-black {
+            background-color: #111111;
+            color: white;
+        }
+
+        .button-white {
+            background-color: white;
+            color: #111111;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            opacity: 0.85;
+        }
+
+
+        /* =========================
+           TITELS
+        ========================= */
+
+        .section {
+            width: 90%;
+            max-width: 1250px;
+            margin: 0 auto 80px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+
+            margin-bottom: 30px;
+        }
+
+        .section-small {
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 3px;
+
+            color: #777777;
+
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-size: 42px;
+        }
+
+        .view-all {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .view-all:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =========================
+           PRODUCTEN
+        ========================= */
+
+        .products {
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 25px;
+        }
+
+        .product {
+            border: 1px solid #e2e2e2;
+
+            background-color: white;
+
+            transition: 0.2s;
+        }
+
+        .product:hover {
+            transform: translateY(-4px);
+        }
+
+        .product-image {
+            height: 350px;
+
+            background-color: #f3f3f3;
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+        .new-label {
+            position: absolute;
+
+            top: 15px;
+            left: 15px;
+
+            background-color: #111111;
+            color: white;
+
+            padding: 8px 10px;
+
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+
+            margin-bottom: 8px;
+        }
+
+        .product-description {
+            color: #777777;
+
+            font-size: 13px;
+
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .stock {
+            margin-top: 10px;
+
+            font-size: 12px;
+
+            color: #555555;
+        }
+
+
+        /* =========================
+           MATCHER
+        ========================= */
+
+        .matcher {
+            width: 90%;
+            max-width: 1250px;
+
+            margin: 0 auto 80px;
+
+            background-color: #111111;
+
+            color: white;
+
+            padding: 70px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 50px;
+        }
+
+        .matcher-content {
+            max-width: 650px;
+        }
+
+        .matcher-small {
+            font-size: 11px;
+            font-weight: bold;
+
+            letter-spacing: 3px;
+
+            margin-bottom: 12px;
+        }
+
+        .matcher h2 {
+            font-size: 45px;
+
+            margin-bottom: 20px;
+        }
+
+        .matcher p {
+            color: #dddddd;
+
+            line-height: 1.6;
+
+            margin-bottom: 25px;
+        }
+
+        .matcher-icon {
+            font-size: 100px;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            border-top: 1px solid #e5e5e5;
+
+            padding: 35px 6%;
+
+            display: flex;
+            justify-content: space-between;
+
+            color: #777777;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           MOBIEL
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            header {
+                height: auto;
+
+                padding: 20px 5%;
+
+                flex-direction: column;
+
+                gap: 20px;
+            }
+
+            nav {
+                gap: 18px;
+
+                flex-wrap: wrap;
+
+                justify-content: center;
+            }
+
+            .hero {
+                min-height: 500px;
+
+                margin: 15px 3% 50px;
+
+                padding: 30px;
+            }
+
+            .hero h1 {
+                font-size: 45px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .section {
+                width: 94%;
+            }
+
+            .section-header {
+                align-items: start;
+
+                flex-direction: column;
+
+                gap: 15px;
+            }
+
+            .section-title {
+                font-size: 34px;
+            }
+
+            .products {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .product-image {
+                height: 280px;
+            }
+
+            .matcher {
+                width: 94%;
+
+                padding: 40px 30px;
+
+                flex-direction: column;
+
+                align-items: start;
+            }
+
+            .matcher h2 {
+                font-size: 35px;
+            }
+
+            .matcher-icon {
+                display: none;
+            }
+
+            footer {
+                flex-direction: column;
+
+                gap: 10px;
+            }
+        }
+
+
+        /* EXTRA KLEIN */
+
+        @media (max-width: 500px) {
+
+            .products {
+                grid-template-columns: 1fr;
+            }
+
+            .product-image {
+                height: 350px;
+            }
+
+            .hero h1 {
+                font-size: 38px;
+            }
+
+            .matcher h2 {
+                font-size: 30px;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header>
+
+        <a href="index.html">
+
+            <div class="logo">
+
+                GAPA
+
+                <span class="logo-small">
+                    LEDERWAREN
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <nav>
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="producten.html">
+                Collectie
+            </a>
+
+            <a href="matcher.html">
+                Matcher
+            </a>
+
+            <a href="login.html">
+                Inloggen
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- =========================
+         HERO / NIEUW
+    ========================= -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <div class="hero-small">
+                GAPA LEDERWAREN · SCHAGEN
+            </div>
+
+            <h1>
+                Ontdek de nieuwste collectie.
+            </h1>
+
+            <p>
+                Ontdek de nieuwste tassen, accessoires en
+                lederwaren van Gapa Lederwaren in de Makado.
+            </p>
+
+            <a
+                href="producten.html"
+                class="button button-white">
+
+                Bekijk collectie
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         NIEUWE ARTIKELEN
+    ========================= -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-small">
+                    NIEUW BINNEN
+                </div>
+
+                <h2 class="section-title">
+                    Nieuwe artikelen
+                </h2>
+
+            </div>
+
+
+            <a
+                href="producten.html"
+                class="view-all">
+
+                Alles bekijken →
+
+            </a>
+
+        </div>
+
+
+
+        <div class="products">
+
+
+            <!-- PRODUCT 1 -->
+
+            <article class="product">
+
+                <div class="product-image">
+
+                    <span class="new-label">
+                        NIEUW
+                    </span>
+
+                    <img
+                        src="images/product1.jpg"
+                        alt="Nieuwe Gapa tas">
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <h3 class="product-name">
+                        Gekleurde schoudertas
+                    </h3>
+
+                    <p class="product-description">
+                        Schoudertas · Rood · Casual
+                    </p>
+
+                    <div class="product-price">
+                        € 59,95
+                    </div>
+
+                    <div class="stock">
+                        Op voorraad: 8
+                    </div>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- PRODUCT 2 -->
+
+            <article class="product">
+
+                <div class="product-image">
+
+                    <span class="new-label">
+                        NIEUW
+                    </span>
+
+                    <img
+                        src="images/product2.jpg"
+                        alt="Leren handtas">
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <h3 class="product-name">
+                        Leren handtas
+                    </h3>
+
+                    <p class="product-description">
+                        Handtas · Zwart · Elegant
+                    </p>
+
+                    <div class="product-price">
+                        € 89,95
+                    </div>
+
+                    <div class="stock">
+                        Op voorraad: 4
+                    </div>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- PRODUCT 3 -->
+
+            <article class="product">
+
+                <div class="product-image">
+
+                    <span class="new-label">
+                        NIEUW
+                    </span>
+
+                    <img
+                        src="images/product3.jpg"
+                        alt="Crossbody tas">
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <h3 class="product-name">
+                        Crossbody tas
+                    </h3>
+
+                    <p class="product-description">
+                        Tas · Groen · Casual
+                    </p>
+
+                    <div class="product-price">
+                        € 64,95
+                    </div>
+
+                    <div class="stock">
+                        Op voorraad: 6
+                    </div>
+
+                </div>
+
+            </article>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         MATCHER
+    ========================= -->
+
+    <section class="matcher">
+
+        <div class="matcher-content">
+
+            <div class="matcher-small">
+                GAPA MATCHER
+            </div>
+
+            <h2>
+                Welke tas past bij jouw outfit?
+            </h2>
+
+            <p>
+                Upload een foto van je outfit en ontdek
+                welke artikelen uit onze collectie erbij
+                passen.
+            </p>
+
+            <a
+                href="matcher.html"
+                class="button button-white">
+
+                Probeer de matcher
+
+            </a>
+
+        </div>
+
+
+        <div class="matcher-icon">
+            👜
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         FOOTER
+    ========================= -->
+
+    <footer>
+
+        <div>
+            <strong>GAPA Lederwaren</strong>
+        </div>
+
+        <div>
+            Makado · Schagen
+        </div>
+
+        <div>
+            © 2026 Gapa Lederwaren
+        </div>
+
+    </footer>
+
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================= -->
+
+    <script>
+
+        /*
+            Dit is alvast de JavaScript-basis.
+
+            Later kunnen we hier bijvoorbeeld:
+            - producten uit de database laden
+            - voorraad automatisch tonen
+            - filters maken
+            - login controleren
+            - matcher koppelen
+            - nieuwe artikelen automatisch tonen
+        */
+
+
+        console.log("Gapa Lederwaren homepage geladen.");
+
+
+        // Voorbeeld van een eenvoudige functie
+        function welkom() {
+
+            console.log(
+                "Welkom bij Gapa Lederwaren!"
+            );
+
+        }
+
+
+        // Functie uitvoeren
+        welkom();
+
+    </script>
+
+
+</body>
+
+</html>
+```
