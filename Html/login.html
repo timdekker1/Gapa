@@ -399,7 +399,7 @@
 
     footer {
 
-        border-top: 1px solid #e5e5e5;
+        background-color: #111111;
 
         padding: 35px 6%;
 
@@ -407,9 +407,22 @@
 
         justify-content: space-between;
 
-        color: #777777;
+        color: white;
 
         font-size: 13px;
+    }
+
+    .footer-hours {
+        display: grid;
+        grid-template-columns: repeat(4, auto);
+        gap: 4px 12px;
+        line-height: 1.25;
+        white-space: nowrap;
+    }
+
+    .footer-hours strong {
+        grid-column: 1 / -1;
+        margin-bottom: 2px;
     }
 
 
@@ -502,15 +515,7 @@
 
     <a href="../index.html">
 
-        <div class="logo">
-
-            GAPA
-
-            <span class="logo-small">
-                LEDERWAREN
-            </span>
-
-        </div>
+        <img class="logo-image" src="../gapalederwaren.jpg" alt="Gapa Lederwaren" style="display: block; width: 150px; height: auto;">
 
     </a>
 
@@ -736,6 +741,17 @@
 
     <div>
         Makado · Schagen
+    </div>
+
+    <div class="footer-hours">
+        <strong>Openingstijden</strong>
+        <span>Ma 09:00–18:00</span>
+        <span>Di 09:30–18:00</span>
+        <span>Wo 09:30–18:00</span>
+        <span>Do 09:30–18:00</span>
+        <span>Vr 09:00–20:00</span>
+        <span>Za 09:00–17:00</span>
+        <span>Zo 12:00–17:00</span>
     </div>
 
     <div>
