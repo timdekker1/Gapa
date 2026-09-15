@@ -4,6 +4,8 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../database.php';
 
+session_start();
+
 $input = json_decode(file_get_contents('php://input'), true);
 $email = strtolower(trim((string) ($input['email'] ?? '')));
 $password = (string) ($input['password'] ?? '');
@@ -23,6 +25,10 @@ if (!$user || !password_verify($password, $user['password_hash'])) {
 	echo json_encode(['success' => false, 'message' => 'Het e-mailadres of wachtwoord is niet correct.']);
 	exit;
 }
+
+session_regenerate_id(true);
+$_SESSION['user_id'] = $user['id'];
+$_SESSION['user_email'] = $user['email'];
 
 echo json_encode([
 	'success' => true,
