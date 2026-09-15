@@ -1,0 +1,31 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: db
+      DB_NAME: gapa_database
+      DB_USER: gapa
+      DB_PASSWORD: gapa_dev_password
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: gapa_database
+      MYSQL_USER: gapa
+      MYSQL_PASSWORD: gapa_dev_password
+      MYSQL_ROOT_PASSWORD: root_dev_password
+    volumes:
+      - gapa_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "gapa", "-pgapa_dev_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  gapa_mysql_data:

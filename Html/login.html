@@ -209,6 +209,20 @@
         gap: 20px;
     }
 
+    .register-form {
+        display: none;
+    }
+
+    .form-message {
+        display: none;
+        padding: 12px;
+        background-color: #f5f5f5;
+        border-left: 3px solid #111111;
+        color: #111111;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
 
     /* =========================
        FORMULIER VELDEN
@@ -698,6 +712,30 @@
 
         </form>
 
+        <form
+            class="login-form register-form"
+            id="registerForm">
+
+            <div class="form-group">
+                <label for="registerEmail">E-mailadres</label>
+                <input type="email" id="registerEmail" name="email" placeholder="Vul je e-mailadres in" autocomplete="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="registerPassword">Wachtwoord</label>
+                <input type="password" id="registerPassword" name="password" placeholder="Minimaal 8 tekens" autocomplete="new-password" minlength="8" required>
+            </div>
+
+            <div class="form-group">
+                <label for="registerPasswordConfirmation">Wachtwoord herhalen</label>
+                <input type="password" id="registerPasswordConfirmation" name="password_confirmation" placeholder="Herhaal je wachtwoord" autocomplete="new-password" minlength="8" required>
+            </div>
+
+            <div class="form-message" id="registerMessage" role="status"></div>
+
+            <button type="submit" class="login-button">Account aanmaken</button>
+        </form>
+
 
 
         <!-- =========================
@@ -712,7 +750,8 @@
 
             <a
                 href="#"
-                class="register-link">
+                class="register-link"
+                id="registerLink">
 
                 Account aanmaken →
 
@@ -774,7 +813,7 @@
 
     document
         .getElementById("loginForm")
-        .addEventListener("submit", function(event) {
+        .addEventListener("submit", async function(event) {
 
             /*
                 Voorkomt dat de pagina
@@ -800,36 +839,69 @@
                     .value;
 
 
-            console.log(
-                "Login geprobeerd:",
-                email
-            );
+            const response = await fetch("/api/auth/login.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+            const result = await response.json();
 
+            if (!response.ok) {
+                document.getElementById("errorMessage").textContent = result.message;
+                document.getElementById("errorMessage").style.display = "block";
+                return;
+            }
 
-            /*
-                HIER KAN JULLIE BACKEND
-                LATER AAN GEKOPPELD WORDEN.
+            window.location.href = "../index.html";
 
-                Bijvoorbeeld:
+        });
 
-                fetch("/api/login", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        password: password
-                    })
-                });
-            */
+    document
+        .getElementById("registerForm")
+        .addEventListener("submit", async function(event) {
+            event.preventDefault();
 
+            const email = document.getElementById("registerEmail").value;
+            const password = document.getElementById("registerPassword").value;
+            const confirmation = document.getElementById("registerPasswordConfirmation").value;
+            const message = document.getElementById("registerMessage");
 
-            console.log(
-                "Frontend login klaar voor backend."
-            );
+            if (password !== confirmation) {
+                message.textContent = "De wachtwoorden komen niet overeen.";
+                message.style.display = "block";
+                return;
+            }
 
+            const response = await fetch("/api/auth/register.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+            const result = await response.json();
+            message.textContent = result.message;
+            message.style.display = "block";
+
+            if (response.ok) {
+                document.getElementById("registerForm").reset();
+                setTimeout(() => showLoginForm(), 1200);
+            }
+        });
+
+    function showLoginForm() {
+        document.getElementById("loginForm").style.display = "flex";
+        document.getElementById("registerForm").style.display = "none";
+        document.querySelector(".login-header h1").textContent = "Inloggen";
+        document.getElementById("registerLink").textContent = "Account aanmaken →";
+    }
+
+    document
+        .getElementById("registerLink")
+        .addEventListener("click", function(event) {
+            event.preventDefault();
+            document.getElementById("loginForm").style.display = "none";
+            document.getElementById("registerForm").style.display = "flex";
+            document.querySelector(".login-header h1").textContent = "Account aanmaken";
+            this.textContent = "Terug naar inloggen →";
         });
 
 
