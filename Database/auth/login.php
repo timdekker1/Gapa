@@ -26,9 +26,19 @@ if (!$user || !password_verify($password, $user['password_hash'])) {
 	exit;
 }
 
+$updateLogin = $pdo->prepare('UPDATE users SET last_login_at = CURRENT_TIMESTAMP, is_logged_in = 1 WHERE id = :id');
+$updateLogin->execute(['id' => $user['id']]);
+
 session_regenerate_id(true);
 $_SESSION['user_id'] = $user['id'];
 $_SESSION['user_email'] = $user['email'];
+
+setcookie(session_name(), session_id(), [
+	'expires' => time() + 86400 * 30,
+	'path' => '/',
+	'httponly' => true,
+	'samesite' => 'Lax',
+]);
 
 echo json_encode([
 	'success' => true,

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instellingen | Gapa Lederwaren</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; font-family: Arial, Helvetica, sans-serif; color: #111; background: #f7f7f5; }
+        header { min-height: 80px; padding: 0 6%; display: flex; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid #e5e5e5; }
+        header img { width: 150px; height: auto; display: block; }
+        nav { display: flex; gap: 30px; align-items: center; }
+        nav a { color: inherit; font-size: 14px; font-weight: bold; text-decoration: none; }
+        nav a:hover { text-decoration: underline; }
+        main { width: 90%; max-width: 620px; margin: 80px auto; }
+        section { padding: 42px; background: #fff; border: 1px solid #e2e2e2; }
+        .eyebrow { color: #777; font-size: 11px; font-weight: bold; letter-spacing: 3px; }
+        h1 { margin: 12px 0; font-size: 42px; }
+        p { color: #666; line-height: 1.6; }
+        .account-email { margin: 28px 0; padding: 16px; background: #f3f3f1; font-weight: bold; }
+        button { padding: 13px 20px; border: 0; background: #111; color: #fff; cursor: pointer; font-weight: bold; }
+        .message { min-height: 22px; margin-top: 18px; color: #a00000; }
+        @media (max-width: 600px) { header { flex-direction: column; gap: 18px; padding: 20px 5%; } nav { gap: 16px; flex-wrap: wrap; justify-content: center; } main { margin: 45px auto; } section { padding: 28px; } h1 { font-size: 34px; } }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="../index.html"><img src="../gapalederwaren.jpg" alt="Gapa Lederwaren"></a>
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="collectie.html">Collectie</a>
+            <a href="matcher.html">Matcher</a>
+            <a href="instellingen.html">Instellingen</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <div class="eyebrow">GAPA LEDERWAREN · ACCOUNT</div>
+            <h1>Instellingen</h1>
+            <p>Bekijk je accountgegevens of meld je veilig af.</p>
+            <div class="account-email" id="accountEmail">Account controleren...</div>
+            <button id="logoutButton" type="button">Uitloggen</button>
+            <div class="message" id="message" role="status"></div>
+        </section>
+    </main>
+    <script>
+        async function loadAccount() {
+            const response = await fetch('/api/auth/session.php', { credentials: 'same-origin' });
+            const result = await response.json();
+            if (!result.authenticated) {
+                window.location.replace('/Html/login.html');
+                return;
+            }
+            document.getElementById('accountEmail').textContent = result.user.email;
+        }
+
+        document.getElementById('logoutButton').addEventListener('click', async function () {
+            const response = await fetch('/api/auth/logout.php', { method: 'POST', credentials: 'same-origin' });
+            if (response.ok) {
+                window.location.replace('/Html/login.html');
+            } else {
+                document.getElementById('message').textContent = 'Uitloggen is niet gelukt.';
+            }
+        });
+
+        loadAccount().catch(() => {
+            document.getElementById('message').textContent = 'Accountgegevens konden niet worden geladen.';
+        });
+    </script>
+</body>
+</html>
