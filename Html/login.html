@@ -807,6 +807,10 @@
 
 <script>
 
+    if (window.location.protocol === "file:") {
+        window.location.replace("http://localhost:8080/Html/login.html");
+    }
+
     /* =========================
        LOGIN FORMULIER
     ========================= */
@@ -853,7 +857,7 @@
 
                 window.location.replace("../index.html");
             } catch (error) {
-                document.getElementById("errorMessage").textContent = error.message || "Inloggen is niet gelukt.";
+                document.getElementById("errorMessage").textContent = error.message || "Inloggen is niet gelukt. Open de website via http://localhost:8080.";
                 document.getElementById("errorMessage").style.display = "block";
             }
 
