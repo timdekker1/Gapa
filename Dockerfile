@@ -9,7 +9,7 @@ RUN rm -f /etc/nginx/conf.d/default.conf
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY nginx-main.conf /etc/nginx/nginx.conf
-COPY index.html gapalederwaren.jpg gapavoorkant.jpg /usr/share/nginx/html/
+COPY index.html *.jpg *.jpeg /usr/share/nginx/html/
 COPY Html/ /usr/share/nginx/html/Html/
 COPY Database/ /var/www/database/
 
