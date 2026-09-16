@@ -4,7 +4,6 @@
 
 <head>
 
-```
 <meta charset="UTF-8">
 
 <meta
@@ -514,13 +513,10 @@
     }
 
 </style>
-```
-
 </head>
 
 <body>
 
-```
 <!-- =========================
      HEADER
 ========================= -->
@@ -626,7 +622,6 @@
                     id="email"
                     name="email"
                     placeholder="Vul je e-mailadres in"
-                    autocomplete="email"
                     required>
 
             </div>
@@ -645,7 +640,6 @@
                     id="password"
                     name="password"
                     placeholder="Vul je wachtwoord in"
-                    autocomplete="current-password"
                     required>
 
             </div>
@@ -844,7 +838,7 @@
 
 
             try {
-                const response = await fetch("/api/auth/login.php", {
+                const response = await fetch("../Database/auth/login.php", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email, password })
@@ -880,7 +874,7 @@
             }
 
             try {
-                const response = await fetch("/api/auth/register.php", {
+                const response = await fetch("../Database/auth/register.php", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email, password })
@@ -934,7 +928,6 @@
         });
 
 </script>
-```
 
 </body>
 

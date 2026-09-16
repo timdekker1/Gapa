@@ -22,11 +22,14 @@ if (strlen($password) < 8) {
 
 try {
 	$statement = $pdo->prepare(
-		'INSERT INTO users (email, password_hash) VALUES (:email, :password_hash)'
+		'INSERT INTO users (name, email, password, password_hash) VALUES (:name, :email, :password, :password_hash)'
 	);
+	$passwordHash = password_hash($password, PASSWORD_DEFAULT);
 	$statement->execute([
+		'name' => $email,
 		'email' => $email,
-		'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+		'password' => $passwordHash,
+		'password_hash' => $passwordHash,
 	]);
 
 	http_response_code(201);

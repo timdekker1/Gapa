@@ -1,13 +1,14 @@
 <?php
 
 $host = getenv('DB_HOST') ?: 'localhost';
+$port = getenv('DB_PORT') ?: '3306';
 $dbname = getenv('DB_NAME') ?: 'gapa_database';
 $username = getenv('DB_USER') ?: 'root';
 $password = getenv('DB_PASSWORD') ?: '';
 
 try {
     $pdo = new PDO(
-        "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
+        "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
         $username,
         $password
     );
@@ -25,6 +26,11 @@ try {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     );
+
+    $passwordHashColumn = $pdo->query("SHOW COLUMNS FROM users LIKE 'password_hash'")->fetch();
+    if (!$passwordHashColumn) {
+        $pdo->exec("ALTER TABLE users ADD COLUMN password_hash VARCHAR(255) NULL AFTER email");
+    }
 
     $lastLoginColumn = $pdo->query("SHOW COLUMNS FROM users LIKE 'last_login_at'")->fetch();
     if (!$lastLoginColumn) {

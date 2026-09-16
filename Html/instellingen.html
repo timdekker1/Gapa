@@ -49,19 +49,19 @@
         }
 
         async function loadAccount() {
-            const response = await fetch('/api/auth/session.php', { credentials: 'same-origin' });
+            const response = await fetch('../Database/auth/session.php', { credentials: 'same-origin' });
             const result = await response.json();
             if (!result.authenticated) {
-                window.location.replace('/Html/login.html');
+                window.location.replace('login.html');
                 return;
             }
             document.getElementById('accountEmail').textContent = result.user.email;
         }
 
         document.getElementById('logoutButton').addEventListener('click', async function () {
-            const response = await fetch('/api/auth/logout.php', { method: 'POST', credentials: 'same-origin' });
+            const response = await fetch('../Database/auth/logout.php', { method: 'POST', credentials: 'same-origin' });
             if (response.ok) {
-                window.location.replace('/Html/login.html');
+                window.location.replace('login.html');
             } else {
                 document.getElementById('message').textContent = 'Uitloggen is niet gelukt.';
             }

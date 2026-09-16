@@ -7,8 +7,9 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Open collectie.html",
-            "file": "c:\\Users\\quinn\\Documents\\GitHub\\Gapa\\Html\\collectie.html"
+            "name": "Open Gapa lokaal",
+            "url": "http://localhost:8000/Html/login.html",
+            "webRoot": "${workspaceFolder}"
         }
     ]
 }
