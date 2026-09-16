@@ -44,6 +44,10 @@
         </section>
     </main>
     <script>
+        if (window.location.protocol === 'file:') {
+            window.location.replace('http://localhost:8080/Html/instellingen.html');
+        }
+
         async function loadAccount() {
             const response = await fetch('/api/auth/session.php', { credentials: 'same-origin' });
             const result = await response.json();
