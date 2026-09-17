@@ -837,23 +837,8 @@
                     .value;
 
 
-            try {
-                const response = await fetch("../Database/auth/login.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password })
-                });
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.message);
-                }
-
-                window.location.replace("/index.html");
-            } catch (error) {
-                document.getElementById("errorMessage").textContent = error.message || "Inloggen is niet gelukt. Open de website via http://localhost:8080.";
-                document.getElementById("errorMessage").style.display = "block";
-            }
+            document.getElementById("errorMessage").textContent = "Supabase-authenticatie moet nog worden aangesloten.";
+            document.getElementById("errorMessage").style.display = "block";
 
         });
 
@@ -873,24 +858,8 @@
                 return;
             }
 
-            try {
-                const response = await fetch("../Database/auth/register.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password })
-                });
-                const result = await response.json();
-                message.textContent = result.message;
-                message.style.display = "block";
-
-                if (response.ok) {
-                    document.getElementById("registerForm").reset();
-                    setTimeout(() => showLoginForm(), 1200);
-                }
-            } catch (error) {
-                message.textContent = "Account aanmaken is niet gelukt. Controleer of de server draait.";
-                message.style.display = "block";
-            }
+            message.textContent = "Supabase-authenticatie moet nog worden aangesloten.";
+            message.style.display = "block";
         });
 
     function showLoginForm() {
