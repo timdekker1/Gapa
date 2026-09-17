@@ -2,7 +2,7 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
-require_once __DIR__ . '/../database.php';
+require_once __DIR__ . '/../database/database.php';
 
 session_start();
 
@@ -23,7 +23,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $password === '') {
 }
 
 $statement = $pdo->prepare(
-    'SELECT id, email, password_hash FROM users WHERE email = :email LIMIT 1'
+    'SELECT id, name, email, password FROM users WHERE email = :email LIMIT 1'
 );
 
 $statement->execute([
@@ -32,7 +32,7 @@ $statement->execute([
 
 $user = $statement->fetch(PDO::FETCH_ASSOC);
 
-if (!$user || !password_verify($password, $user['password_hash'])) {
+if (!$user || !password_verify($password, $user['password'])) {
     http_response_code(401);
 
     echo json_encode([
@@ -46,7 +46,7 @@ if (!$user || !password_verify($password, $user['password_hash'])) {
 session_regenerate_id(true);
 
 $_SESSION['user_id'] = $user['id'];
-$_SESSION['user_name'] = $user['email'];
+$_SESSION['user_name'] = $user['name'];
 $_SESSION['user_email'] = $user['email'];
 
 echo json_encode([
@@ -54,7 +54,7 @@ echo json_encode([
     'message' => 'Je bent ingelogd.',
     'user' => [
         'id' => $user['id'],
-        'name' => $user['email'],
+        'name' => $user['name'],
         'email' => $user['email']
     ]
 ]);
