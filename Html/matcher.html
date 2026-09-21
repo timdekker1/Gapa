@@ -843,11 +843,11 @@
 
         </a>
 
-        <a href="login.html">
+        <a href="login.html" id="navAuthLink">
             Inloggen
         </a>
 
-            <a href="instellingen.html">
+            <a href="instellingen.html" id="navSettingsLink" style="display:none">
                 Instellingen
             </a>
 
@@ -1859,7 +1859,19 @@
 
 <script src="products.js"></script>
 
-```
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+    const sb = supabase.createClient(
+        "https://gpjaxsppsggzlmdsnxvy.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwamF4c3Bwc2dnemxtZHNueHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzkwMzgsImV4cCI6MjEwNTIxNTAzOH0.ZpSxSYPyAP6eUPgVdLK-MBmeDBbLD7JM9qk-32ow-cY"
+    );
+    sb.auth.getSession().then(({ data }) => {
+        if (data.session) {
+            document.getElementById('navAuthLink').style.display     = 'none';
+            document.getElementById('navSettingsLink').style.display = 'inline';
+        }
+    });
+</script>
 
 </body>
 

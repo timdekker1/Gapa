@@ -796,87 +796,169 @@
 
 
 <!-- =========================
+     SUPABASE SDK
+========================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+
+<!-- =========================
      JAVASCRIPT
 ========================= -->
 
 <script>
 
-    if (window.location.protocol === "file:") {
-        window.location.replace("http://localhost:8080/Html/login.html");
+    /* =========================
+       SUPABASE CLIENT
+    ========================= */
+
+    const SUPABASE_URL  = "https://gpjaxsppsggzlmdsnxvy.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwamF4c3Bwc2dnemxtZHNueHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzkwMzgsImV4cCI6MjEwNTIxNTAzOH0.ZpSxSYPyAP6eUPgVdLK-MBmeDBbLD7JM9qk-32ow-cY";
+
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    /* Als er al een sessie is, direct naar home */
+    sb.auth.getSession().then(({ data }) => {
+        if (data.session) {
+            window.location.replace("../index.html");
+        }
+    });
+
+
+    /* =========================
+       HULPFUNCTIES
+    ========================= */
+
+    function setLoading(button, loading) {
+        button.disabled = loading;
+        button.textContent = loading ? "Even geduld..." : button.dataset.label;
     }
+
+    function showError(id, text) {
+        const el = document.getElementById(id);
+        el.textContent = text;
+        el.style.display = "block";
+    }
+
+    function hideError(id) {
+        const el = document.getElementById(id);
+        el.style.display = "none";
+    }
+
 
     /* =========================
        LOGIN FORMULIER
     ========================= */
 
+    const loginBtn = document.querySelector("#loginForm .login-button");
+    loginBtn.dataset.label = "Inloggen";
+
     document
         .getElementById("loginForm")
-        .addEventListener("submit", async function(event) {
-
-            /*
-                Voorkomt dat de pagina
-                automatisch opnieuw laadt.
-
-                De backend kan dit later
-                overnemen.
-            */
-
+        .addEventListener("submit", async function (event) {
             event.preventDefault();
 
+            const email    = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
 
-            /* Gegevens ophalen */
+            hideError("errorMessage");
+            setLoading(loginBtn, true);
 
-            const email =
-                document
-                    .getElementById("email")
-                    .value;
+            const { error } = await sb.auth.signInWithPassword({ email, password });
 
-            const password =
-                document
-                    .getElementById("password")
-                    .value;
+            setLoading(loginBtn, false);
 
+            if (error) {
+                /* Vertaal de meest voorkomende Supabase foutmeldingen */
+                const meldingen = {
+                    "Invalid login credentials": "Het e-mailadres of wachtwoord is niet correct.",
+                    "Email not confirmed":        "Bevestig eerst je e-mailadres via de link in je inbox.",
+                    "Too many requests":          "Te veel pogingen. Wacht even en probeer het opnieuw."
+                };
+                showError("errorMessage", meldingen[error.message] || error.message);
+                return;
+            }
 
-            document.getElementById("errorMessage").textContent = "Supabase-authenticatie moet nog worden aangesloten.";
-            document.getElementById("errorMessage").style.display = "block";
-
+            /* Inloggen geslaagd → terug naar home */
+            window.location.replace("../index.html");
         });
+
+
+    /* =========================
+       REGISTREER FORMULIER
+    ========================= */
+
+    const registerBtn = document.querySelector("#registerForm .login-button");
+    registerBtn.dataset.label = "Account aanmaken";
 
     document
         .getElementById("registerForm")
-        .addEventListener("submit", async function(event) {
+        .addEventListener("submit", async function (event) {
             event.preventDefault();
 
-            const email = document.getElementById("registerEmail").value;
-            const password = document.getElementById("registerPassword").value;
+            const email        = document.getElementById("registerEmail").value.trim();
+            const password     = document.getElementById("registerPassword").value;
             const confirmation = document.getElementById("registerPasswordConfirmation").value;
-            const message = document.getElementById("registerMessage");
+            const message      = document.getElementById("registerMessage");
+
+            /* Reset */
+            message.style.display = "none";
+            message.style.borderLeftColor = "#111111";
+            message.style.color = "#111111";
 
             if (password !== confirmation) {
-                message.textContent = "De wachtwoorden komen niet overeen.";
+                message.textContent   = "De wachtwoorden komen niet overeen.";
                 message.style.display = "block";
                 return;
             }
 
-            message.textContent = "Supabase-authenticatie moet nog worden aangesloten.";
+            setLoading(registerBtn, true);
+
+            const { error } = await sb.auth.signUp({ email, password });
+
+            setLoading(registerBtn, false);
+
+            if (error) {
+                message.textContent        = error.message;
+                message.style.borderLeftColor = "#a00000";
+                message.style.color           = "#a00000";
+                message.style.display         = "block";
+                return;
+            }
+
+            /* Geslaagd: toon bevestigingsbericht */
+            message.textContent   = "Account aangemaakt! Controleer je inbox en bevestig je e-mailadres om in te loggen.";
             message.style.display = "block";
+            document.getElementById("registerForm").reset();
         });
 
-    function showLoginForm() {
-        document.getElementById("loginForm").style.display = "flex";
-        document.getElementById("registerForm").style.display = "none";
-        document.querySelector(".login-header h1").textContent = "Inloggen";
-        document.getElementById("registerLink").textContent = "Account aanmaken →";
-    }
+
+    /* =========================
+       FORMULIER WISSELEN
+    ========================= */
 
     document
         .getElementById("registerLink")
-        .addEventListener("click", function(event) {
+        .addEventListener("click", function (event) {
             event.preventDefault();
-            document.getElementById("loginForm").style.display = "none";
-            document.getElementById("registerForm").style.display = "flex";
-            document.querySelector(".login-header h1").textContent = "Account aanmaken";
-            this.textContent = "Terug naar inloggen →";
+
+            const showingRegister =
+                document.getElementById("registerForm").style.display === "flex";
+
+            if (showingRegister) {
+                /* Terug naar inloggen */
+                document.getElementById("loginForm").style.display    = "flex";
+                document.getElementById("registerForm").style.display = "none";
+                document.querySelector(".login-header h1").textContent = "Inloggen";
+                this.textContent = "Account aanmaken →";
+            } else {
+                /* Naar registreren */
+                document.getElementById("loginForm").style.display    = "none";
+                document.getElementById("registerForm").style.display = "flex";
+                document.querySelector(".login-header h1").textContent = "Account aanmaken";
+                this.textContent = "Terug naar inloggen →";
+            }
         });
 
 
@@ -886,14 +968,29 @@
 
     document
         .querySelector(".forgot-password")
-        .addEventListener("click", function(event) {
-
+        .addEventListener("click", async function (event) {
             event.preventDefault();
 
-            alert(
-                "De functie 'Wachtwoord vergeten' kan later aan de backend worden gekoppeld."
-            );
+            const email = document.getElementById("email").value.trim();
 
+            if (!email) {
+                showError("errorMessage", "Vul eerst je e-mailadres in, dan sturen we je een resetlink.");
+                return;
+            }
+
+            hideError("errorMessage");
+
+            const { error } = await sb.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + "/Html/login.html"
+            });
+
+            if (error) {
+                showError("errorMessage", error.message);
+            } else {
+                showError("errorMessage", "Resetlink verstuurd! Controleer je inbox.");
+                document.getElementById("errorMessage").style.borderLeftColor = "#111111";
+                document.getElementById("errorMessage").style.color           = "#111111";
+            }
         });
 
 </script>

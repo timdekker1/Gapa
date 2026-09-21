@@ -579,11 +579,11 @@
                 Matcher
             </a>
 
-            <a href="Html/login.html">
+            <a href="Html/login.html" id="navAuthLink">
                 Inloggen
             </a>
 
-            <a href="Html/instellingen.html">
+            <a href="Html/instellingen.html" id="navSettingsLink" style="display:none">
                 Instellingen
             </a>
 
@@ -881,37 +881,19 @@
          JAVASCRIPT
     ========================= -->
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script>
+        const SUPABASE_URL  = "https://gpjaxsppsggzlmdsnxvy.supabase.co";
+        const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwamF4c3Bwc2dnemxtZHNueHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzkwMzgsImV4cCI6MjEwNTIxNTAzOH0.ZpSxSYPyAP6eUPgVdLK-MBmeDBbLD7JM9qk-32ow-cY";
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-        /*
-            Dit is alvast de JavaScript-basis.
-
-            Later kunnen we hier bijvoorbeeld:
-            - producten uit de database laden
-            - voorraad automatisch tonen
-            - filters maken
-            - login controleren
-            - matcher koppelen
-            - nieuwe artikelen automatisch tonen
-        */
-
-
-        console.log("Gapa Lederwaren homepage geladen.");
-
-
-        // Voorbeeld van een eenvoudige functie
-        function welkom() {
-
-            console.log(
-                "Welkom bij Gapa Lederwaren!"
-            );
-
-        }
-
-
-        // Functie uitvoeren
-        welkom();
-
+        /* Nav aanpassen op basis van inlogstatus */
+        sb.auth.getSession().then(({ data }) => {
+            if (data.session) {
+                document.getElementById('navAuthLink').style.display    = 'none';
+                document.getElementById('navSettingsLink').style.display = 'inline';
+            }
+        });
     </script>
 
 
