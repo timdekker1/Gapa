@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beheer | Gapa Lederwaren</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f5f5;
+            color: #111;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        /* ---- HEADER ---- */
+        header {
+            background: #111;
+            color: #fff;
+            padding: 0 6%;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-left img {
+            width: 120px;
+            height: auto;
+            display: block;
+            filter: brightness(0) invert(1);
+        }
+
+        .admin-badge {
+            background: #fff;
+            color: #111;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            padding: 4px 10px;
+        }
+
+        header nav {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        header nav a {
+            color: #ccc;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        header nav a:hover { color: #fff; }
+
+        #logoutBtn {
+            background: none;
+            border: 1px solid #555;
+            color: #ccc;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        #logoutBtn:hover { border-color: #fff; color: #fff; }
+
+        /* ---- MAIN ---- */
+        main {
+            width: 92%;
+            max-width: 1300px;
+            margin: 40px auto;
+            flex: 1;
+        }
+
+        .page-title {
+            margin-bottom: 30px;
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #777;
+            margin-bottom: 8px;
+        }
+
+        .page-title h1 { font-size: 38px; }
+
+        .page-title p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* ---- STATS BAR ---- */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid #e2e2e2;
+            padding: 22px 24px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #777;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .stat-value.rood  { color: #a00000; }
+        .stat-value.oranje { color: #c05000; }
+        .stat-value.groen { color: #2a7a2a; }
+
+        /* ---- TOOLBAR ---- */
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .toolbar input[type="text"] {
+            padding: 11px 14px;
+            border: 1px solid #d5d5d5;
+            font-size: 13px;
+            width: 260px;
+            outline: none;
+        }
+
+        .toolbar input[type="text"]:focus { border-color: #111; }
+
+        .toolbar select {
+            padding: 11px 14px;
+            border: 1px solid #d5d5d5;
+            font-size: 13px;
+            background: #fff;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .toolbar select:focus { border-color: #111; }
+
+        .toolbar-spacer { flex: 1; }
+
+        .btn {
+            padding: 11px 18px;
+            border: none;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            transition: opacity 0.15s;
+        }
+
+        .btn:hover { opacity: 0.8; }
+        .btn-dark  { background: #111; color: #fff; }
+        .btn-light { background: #fff; color: #111; border: 1px solid #d5d5d5; }
+
+        /* ---- TABEL ---- */
+        .table-wrap {
+            background: #fff;
+            border: 1px solid #e2e2e2;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead th {
+            background: #111;
+            color: #fff;
+            padding: 13px 16px;
+            text-align: left;
+            font-size: 11px;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        tbody tr { border-bottom: 1px solid #f0f0f0; }
+        tbody tr:hover { background: #fafafa; }
+
+        tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+        }
+
+        .product-thumb {
+            width: 52px;
+            height: 52px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .product-thumb-broken {
+            width: 52px;
+            height: 52px;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .stock-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 2px;
+        }
+
+        .stock-ok     { background: #e6f4e6; color: #2a7a2a; }
+        .stock-laag   { background: #fff3e6; color: #c05000; }
+        .stock-leeg   { background: #fde8e8; color: #a00000; }
+
+        /* ---- VOORRAAD CONTROL ---- */
+        .stock-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stock-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #d5d5d5;
+            background: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: inherit;
+            transition: background 0.1s;
+        }
+
+        .stock-btn.plus { background: #111; color: #fff; border-color: #111; }
+        .stock-btn:hover { opacity: 0.75; }
+        .stock-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .stock-input {
+            width: 54px;
+            text-align: center;
+            padding: 5px;
+            border: 1px solid #d5d5d5;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .stock-input:focus { border-color: #111; }
+
+        .save-btn {
+            padding: 5px 12px;
+            background: #111;
+            color: #fff;
+            border: none;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            display: none;
+        }
+
+        .save-btn.zichtbaar { display: inline-block; }
+        .save-btn:hover { opacity: 0.8; }
+
+        .save-status {
+            font-size: 11px;
+            font-weight: bold;
+            min-width: 60px;
+        }
+
+        .save-status.ok  { color: #2a7a2a; }
+        .save-status.err { color: #a00000; }
+
+        /* ---- LAAD STATUS ---- */
+        #laadStatus {
+            padding: 50px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* ---- GEEN RESULTATEN ---- */
+        #geenResultaten {
+            display: none;
+            padding: 40px;
+            text-align: center;
+            color: #777;
+        }
+
+        /* ---- FOOTER ---- */
+        footer {
+            background: #111;
+            color: #fff;
+            padding: 25px 6%;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 900px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 600px) {
+            header { flex-direction: column; padding: 16px 5%; gap: 12px; }
+            main { width: 96%; margin: 24px auto; }
+            .stats { grid-template-columns: 1fr 1fr; }
+            .page-title h1 { font-size: 28px; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar input[type="text"] { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- =====================
+     HEADER
+===================== -->
+<header>
+    <div class="header-left">
+        <a href="../index.html">
+            <img src="../gapalederwaren.jpg" alt="Gapa"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+            <span style="display:none;font-size:20px;font-weight:900;letter-spacing:3px;color:#fff;">GAPA</span>
+        </a>
+        <span class="admin-badge">BEHEER</span>
+    </div>
+
+    <nav>
+        <a href="../index.html">Site</a>
+        <a href="collectie.html">Collectie</a>
+        <span id="adminEmail" style="color:#888; font-size:12px;"></span>
+        <button id="logoutBtn" type="button">Uitloggen</button>
+    </nav>
+</header>
+
+
+<!-- =====================
+     MAIN
+===================== -->
+<main>
+
+    <div class="page-title">
+        <div class="eyebrow">GAPA LEDERWAREN · BEHEER</div>
+        <h1>Voorraadbeheer</h1>
+        <p>Pas de voorraad per product aan. Wijzigingen worden direct opgeslagen in de database.</p>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-label">TOTAAL PRODUCTEN</div>
+            <div class="stat-value" id="statTotaal">—</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">OP VOORRAAD</div>
+            <div class="stat-value groen" id="statOpVoorraad">—</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">BIJNA OP</div>
+            <div class="stat-value oranje" id="statLaag">—</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">UITVERKOCHT</div>
+            <div class="stat-value rood" id="statLeeg">—</div>
+        </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <input type="text" id="zoekInput" placeholder="Zoek product..." oninput="filterTabel()">
+        <select id="filterCategorie" onchange="filterTabel()">
+            <option value="all">Alle categorieën</option>
+            <option value="kleding">Kleding</option>
+            <option value="tassen">Tassen</option>
+        </select>
+        <select id="filterVoorraad" onchange="filterTabel()">
+            <option value="all">Alle voorraad</option>
+            <option value="ok">Op voorraad (3+)</option>
+            <option value="laag">Bijna op (1–2)</option>
+            <option value="leeg">Uitverkocht (0)</option>
+        </select>
+        <div class="toolbar-spacer"></div>
+        <button class="btn btn-light" onclick="allesHerladen()">↺ Herladen</button>
+    </div>
+
+    <!-- TABEL -->
+    <div class="table-wrap">
+        <div id="laadStatus">Producten laden...</div>
+        <div id="geenResultaten">Geen producten gevonden.</div>
+        <table id="productTabel" style="display:none;">
+            <thead>
+                <tr>
+                    <th>FOTO</th>
+                    <th>NAAM</th>
+                    <th>CATEGORIE</th>
+                    <th>KLEUR</th>
+                    <th>VOORRAAD</th>
+                    <th>AANPASSEN</th>
+                    <th>STATUS</th>
+                </tr>
+            </thead>
+            <tbody id="tabelBody"></tbody>
+        </table>
+    </div>
+
+</main>
+
+
+<!-- =====================
+     FOOTER
+===================== -->
+<footer>
+    <span><strong>GAPA Lederwaren</strong> · Beheer paneel</span>
+    <span>© 2026 Gapa Lederwaren</span>
+</footer>
+
+
+<!-- =====================
+     JAVASCRIPT
+===================== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+
+    /* =====================
+       SUPABASE
+    ===================== */
+    const SUPABASE_URL  = "https://gpjaxsppsggzlmdsnxvy.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwamF4c3Bwc2dnemxtZHNueHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzkwMzgsImV4cCI6MjEwNTIxNTAzOH0.ZpSxSYPyAP6eUPgVdLK-MBmeDBbLD7JM9qk-32ow-cY";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    let alleProducten = [];
+
+    /* =====================
+       AUTH CHECK
+    ===================== */
+    async function checkToegang() {
+        const { data: sessionData } = await sb.auth.getSession();
+        if (!sessionData.session) {
+            window.location.replace("login.html");
+            return false;
+        }
+
+        document.getElementById("adminEmail").textContent =
+            sessionData.session.user.email;
+
+        /* Admin check */
+        const { data: adminData } = await sb
+            .from("admins")
+            .select("user_id")
+            .eq("user_id", sessionData.session.user.id)
+            .maybeSingle();
+
+        if (!adminData) {
+            document.body.innerHTML =
+                "<div style='padding:80px; text-align:center;'>" +
+                "<h2>Geen toegang</h2>" +
+                "<p style='color:#777; margin-top:12px;'>Dit paneel is alleen voor beheerders.</p>" +
+                "<a href='collectie.html' style='display:inline-block; margin-top:24px; " +
+                "padding:12px 20px; background:#111; color:#fff; font-weight:bold;'>" +
+                "Terug naar collectie</a></div>";
+            return false;
+        }
+
+        return true;
+    }
+
+    /* =====================
+       PRODUCTEN LADEN
+    ===================== */
+    async function laadProducten() {
+        document.getElementById("laadStatus").style.display = "block";
+        document.getElementById("productTabel").style.display = "none";
+
+        const { data, error } = await sb
+            .from("products")
+            .select("id, name, category, color, image_path, stock, is_available")
+            .order("id");
+
+        if (error || !data) {
+            document.getElementById("laadStatus").textContent =
+                "Fout bij laden: " + (error ? error.message : "onbekende fout");
+            return;
+        }
+
+        alleProducten = data;
+        document.getElementById("laadStatus").style.display = "none";
+        document.getElementById("productTabel").style.display = "table";
+
+        updateStats(data);
+        renderTabel(data);
+    }
+
+    /* =====================
+       STATS BIJWERKEN
+    ===================== */
+    function updateStats(producten) {
+        const totaal     = producten.length;
+        const leeg       = producten.filter(function(p) { return p.stock === 0; }).length;
+        const laag       = producten.filter(function(p) { return p.stock >= 1 && p.stock <= 2; }).length;
+        const opVoorraad = producten.filter(function(p) { return p.stock >= 3; }).length;
+
+        document.getElementById("statTotaal").textContent     = totaal;
+        document.getElementById("statOpVoorraad").textContent = opVoorraad;
+        document.getElementById("statLaag").textContent       = laag;
+        document.getElementById("statLeeg").textContent       = leeg;
+    }
+
+    /* =====================
+       TABEL RENDEREN
+    ===================== */
+    function renderTabel(producten) {
+        const tbody = document.getElementById("tabelBody");
+        tbody.replaceChildren();
+
+        if (producten.length === 0) {
+            document.getElementById("geenResultaten").style.display = "block";
+            document.getElementById("productTabel").style.display   = "none";
+            return;
+        }
+
+        document.getElementById("geenResultaten").style.display = "none";
+        document.getElementById("productTabel").style.display   = "table";
+
+        producten.forEach(function(product) {
+            const tr = document.createElement("tr");
+            tr.dataset.id = product.id;
+
+            /* Foto */
+            const tdFoto = document.createElement("td");
+            const img    = document.createElement("img");
+            img.src      = "../" + product.image_path;
+            img.alt      = product.name;
+            img.className = "product-thumb";
+            img.onerror   = function() {
+                this.style.display = "none";
+                const placeholder = document.createElement("div");
+                placeholder.className = "product-thumb-broken";
+                placeholder.textContent = "📷";
+                this.parentNode.appendChild(placeholder);
+            };
+            tdFoto.appendChild(img);
+            tr.appendChild(tdFoto);
+
+            /* Naam */
+            const tdNaam = document.createElement("td");
+            tdNaam.style.fontWeight = "bold";
+            tdNaam.style.maxWidth   = "200px";
+            tdNaam.textContent      = product.name;
+            tr.appendChild(tdNaam);
+
+            /* Categorie */
+            const tdCat       = document.createElement("td");
+            tdCat.textContent = product.category.charAt(0).toUpperCase() + product.category.slice(1);
+            tr.appendChild(tdCat);
+
+            /* Kleur */
+            const tdKleur       = document.createElement("td");
+            tdKleur.textContent = product.color.charAt(0).toUpperCase() + product.color.slice(1);
+            tr.appendChild(tdKleur);
+
+            /* Voorraad badge */
+            const tdVoorraad = document.createElement("td");
+            const badge      = document.createElement("span");
+            badge.className  = "stock-badge " + stockClass(product.stock);
+            badge.id         = "badge-" + product.id;
+            badge.textContent = stockTekst(product.stock);
+            tdVoorraad.appendChild(badge);
+            tr.appendChild(tdVoorraad);
+
+            /* Aanpassen control */
+            const tdControl = document.createElement("td");
+            const control   = document.createElement("div");
+            control.className = "stock-control";
+
+            const minBtn      = document.createElement("button");
+            minBtn.className  = "stock-btn";
+            minBtn.textContent = "−";
+            minBtn.title      = "Verlagen";
+            minBtn.addEventListener("click", function() {
+                stapAanpassen(product.id, -1);
+            });
+
+            const input       = document.createElement("input");
+            input.type        = "number";
+            input.min         = "0";
+            input.max         = "999";
+            input.value       = product.stock;
+            input.className   = "stock-input";
+            input.id          = "input-" + product.id;
+            input.addEventListener("input", function() {
+                toonOpslaan(product.id);
+            });
+
+            const plusBtn      = document.createElement("button");
+            plusBtn.className  = "stock-btn plus";
+            plusBtn.textContent = "+";
+            plusBtn.title       = "Verhogen";
+            plusBtn.addEventListener("click", function() {
+                stapAanpassen(product.id, +1);
+            });
+
+            const saveBtn     = document.createElement("button");
+            saveBtn.className = "save-btn";
+            saveBtn.id        = "save-" + product.id;
+            saveBtn.textContent = "Opslaan";
+            saveBtn.addEventListener("click", function() {
+                slaOpVanInput(product.id);
+            });
+
+            control.appendChild(minBtn);
+            control.appendChild(input);
+            control.appendChild(plusBtn);
+            control.appendChild(saveBtn);
+            tdControl.appendChild(control);
+            tr.appendChild(tdControl);
+
+            /* Status */
+            const tdStatus  = document.createElement("td");
+            const statusEl  = document.createElement("span");
+            statusEl.className = "save-status";
+            statusEl.id       = "status-" + product.id;
+            tdStatus.appendChild(statusEl);
+            tr.appendChild(tdStatus);
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    /* =====================
+       VOORRAAD HELPERS
+    ===================== */
+    function stockClass(stock) {
+        if (stock === 0) return "stock-leeg";
+        if (stock <= 2)  return "stock-laag";
+        return "stock-ok";
+    }
+
+    function stockTekst(stock) {
+        if (stock === 0) return "Uitverkocht";
+        if (stock <= 2)  return "Laag (" + stock + ")";
+        return "Op voorraad (" + stock + ")";
+    }
+
+    function toonOpslaan(productId) {
+        const saveBtn = document.getElementById("save-" + productId);
+        if (saveBtn) saveBtn.classList.add("zichtbaar");
+    }
+
+    /* =====================
+       STAP AANPASSEN (+ / −)
+    ===================== */
+    function stapAanpassen(productId, delta) {
+        const input = document.getElementById("input-" + productId);
+        if (!input) return;
+        const huidige    = parseInt(input.value) || 0;
+        const nieuw      = Math.max(0, huidige + delta);
+        input.value      = nieuw;
+        slaOpVanInput(productId);
+    }
+
+    /* =====================
+       OPSLAAN VANUIT INPUT
+    ===================== */
+    async function slaOpVanInput(productId) {
+        const input    = document.getElementById("input-" + productId);
+        const statusEl = document.getElementById("status-" + productId);
+        const saveBtn  = document.getElementById("save-" + productId);
+
+        if (!input) return;
+
+        const nieuw = Math.max(0, parseInt(input.value) || 0);
+        input.value = nieuw;
+
+        statusEl.textContent = "Opslaan...";
+        statusEl.className   = "save-status";
+
+        const { error } = await sb
+            .from("products")
+            .update({ stock: nieuw, updated_at: new Date().toISOString() })
+            .eq("id", productId);
+
+        if (error) {
+            statusEl.textContent = "✗ Fout";
+            statusEl.className   = "save-status err";
+            return;
+        }
+
+        /* Badge bijwerken */
+        const badge = document.getElementById("badge-" + productId);
+        if (badge) {
+            badge.textContent = stockTekst(nieuw);
+            badge.className   = "stock-badge " + stockClass(nieuw);
+        }
+
+        /* Lokale data bijwerken */
+        const local = alleProducten.find(function(p) { return p.id === productId; });
+        if (local) local.stock = nieuw;
+
+        /* Stats herberekenen */
+        updateStats(alleProducten);
+
+        /* UI resetten */
+        statusEl.textContent = "✓ Opgeslagen";
+        statusEl.className   = "save-status ok";
+        if (saveBtn) saveBtn.classList.remove("zichtbaar");
+
+        setTimeout(function() {
+            if (statusEl) statusEl.textContent = "";
+        }, 2500);
+    }
+
+    /* =====================
+       FILTER + ZOEK
+    ===================== */
+    function filterTabel() {
+        const zoek      = document.getElementById("zoekInput").value.toLowerCase();
+        const categorie = document.getElementById("filterCategorie").value;
+        const voorraad  = document.getElementById("filterVoorraad").value;
+
+        const gefilterd = alleProducten.filter(function(p) {
+            const matchZoek = p.name.toLowerCase().includes(zoek) ||
+                              p.color.toLowerCase().includes(zoek);
+            const matchCat  = categorie === "all" || p.category === categorie;
+            const matchVrd  = voorraad  === "all" ||
+                              (voorraad === "ok"   && p.stock >= 3) ||
+                              (voorraad === "laag" && p.stock >= 1 && p.stock <= 2) ||
+                              (voorraad === "leeg" && p.stock === 0);
+            return matchZoek && matchCat && matchVrd;
+        });
+
+        renderTabel(gefilterd);
+    }
+
+    /* =====================
+       HERLADEN
+    ===================== */
+    async function allesHerladen() {
+        document.getElementById("zoekInput").value        = "";
+        document.getElementById("filterCategorie").value  = "all";
+        document.getElementById("filterVoorraad").value   = "all";
+        await laadProducten();
+    }
+
+    /* =====================
+       UITLOGGEN
+    ===================== */
+    document.getElementById("logoutBtn").addEventListener("click", async function() {
+        await sb.auth.signOut();
+        window.location.replace("login.html");
+    });
+
+    /* =====================
+       OPSTARTEN
+    ===================== */
+    (async function() {
+        const toegang = await checkToegang();
+        if (toegang) await laadProducten();
+    })();
+
+</script>
+</body>
+</html>

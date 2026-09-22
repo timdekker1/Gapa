@@ -820,7 +820,7 @@
 
     <a href="../index.html">
 
-        <img class="logo-image" src="../gapalederwaren.jpg" alt="Gapa Lederwaren" style="display: block; width: 150px; height: auto;">
+        <img class="logo-image" src="../gapalederwaren.jpg" alt="Gapa Lederwaren" style="display: block; width: 150px; height: auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none;font-size:22px;font-weight:900;letter-spacing:3px;">GAPA</span>
 
     </a>
 
@@ -1541,68 +1541,159 @@
 
 
     /* =========================
+       KLEURANALYSE
+    ========================= */
+
+    /*
+        Bekende kleuren in de collectie met
+        hun RGB-waarden voor vergelijking.
+    */
+    const COLLECTIE_KLEUREN = [
+        { naam: "zwart",  r:  30,  g:  30,  b:  30 },
+        { naam: "bruin",  r: 120,  g:  70,  b:  35 },
+        { naam: "grijs",  r: 130,  g: 130,  b: 130 },
+        { naam: "blauw",  r:  40,  g:  80,  b: 160 },
+        { naam: "rood",   r: 160,  g:  30,  b:  40 },
+        { naam: "groen",  r:  40,  g: 100,  b:  60 },
+        { naam: "beige",  r: 210,  g: 185,  b: 150 },
+        { naam: "roze",   r: 210,  g: 140,  b: 150 },
+        { naam: "paars",  r: 100,  g:  50,  b: 130 },
+        { naam: "oranje", r: 210,  g: 100,  b:  30 },
+        { naam: "teal",   r:  40,  g: 140,  b: 140 },
+        { naam: "wit",    r: 230,  g: 230,  b: 230 },
+    ];
+
+    /* Euclidische afstand in RGB-ruimte */
+    function kleurAfstand(r1, g1, b1, r2, g2, b2) {
+        return Math.sqrt(
+            Math.pow(r1 - r2, 2) +
+            Math.pow(g1 - g2, 2) +
+            Math.pow(b1 - b2, 2)
+        );
+    }
+
+    /* Dichtstbijzijnde collectiekleur vinden */
+    function dichtstbijzijndeKleur(r, g, b) {
+        let beste = COLLECTIE_KLEUREN[0];
+        let minAfstand = Infinity;
+        COLLECTIE_KLEUREN.forEach(function(kleur) {
+            const afstand = kleurAfstand(r, g, b, kleur.r, kleur.g, kleur.b);
+            if (afstand < minAfstand) {
+                minAfstand = afstand;
+                beste = kleur;
+            }
+        });
+        return beste.naam;
+    }
+
+    /* Dominante kleur uit afbeelding halen via Canvas */
+    function analyseerAfbeelding(img) {
+        const canvas  = document.createElement("canvas");
+        const schaal  = 80; /* Verkleinen voor snelheid */
+        canvas.width  = schaal;
+        canvas.height = schaal;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, schaal, schaal);
+
+        const pixels = ctx.getImageData(0, 0, schaal, schaal).data;
+
+        /* Sla te lichte (wit/achtergrond) en te donkere pixels over */
+        let totaalR = 0, totaalG = 0, totaalB = 0, aantal = 0;
+        for (let i = 0; i < pixels.length; i += 4) {
+            const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+            const helderheid = (r + g + b) / 3;
+            if (helderheid > 20 && helderheid < 235) {
+                totaalR += r;
+                totaalG += g;
+                totaalB += b;
+                aantal++;
+            }
+        }
+
+        if (aantal === 0) return null;
+
+        const gemR = Math.round(totaalR / aantal);
+        const gemG = Math.round(totaalG / aantal);
+        const gemB = Math.round(totaalB / aantal);
+
+        return dichtstbijzijndeKleur(gemR, gemG, gemB);
+    }
+
+    /* Statusregel tonen boven de resultaten */
+    function toonFotoStatus(tekst) {
+        let statusEl = document.getElementById("fotoMatchStatus");
+        if (!statusEl) {
+            statusEl = document.createElement("p");
+            statusEl.id = "fotoMatchStatus";
+            statusEl.style.cssText =
+                "margin-bottom:16px; font-size:13px; color:#555;" +
+                "padding:10px 14px; background:#f5f5f5;" +
+                "border-left:3px solid #111;";
+            const resultSection = document.querySelector(".results");
+            resultSection.insertBefore(statusEl, resultSection.firstChild);
+        }
+        statusEl.textContent = tekst;
+        statusEl.style.display = tekst ? "block" : "none";
+    }
+
+
+    /* =========================
        FOTO UPLOADEN
     ========================= */
 
-    const photoInput =
-        document.getElementById("photoInput");
+    const photoInput   = document.getElementById("photoInput");
+    const imagePreview = document.getElementById("imagePreview");
+    const uploadContent = document.getElementById("uploadContent");
 
-    const imagePreview =
-        document.getElementById("imagePreview");
+    photoInput.addEventListener("change", function () {
+        const file = this.files[0];
+        if (!file) return;
 
-    const uploadContent =
-        document.getElementById("uploadContent");
-
-
-    photoInput.addEventListener(
-        "change",
-        function() {
-
-            const file =
-                this.files[0];
-
-            if (!file) {
-                return;
-            }
-
-
-            /* Controleren of het een afbeelding is */
-
-            if (!file.type.startsWith("image/")) {
-
-                alert(
-                    "Selecteer een geldige afbeelding."
-                );
-
-                return;
-            }
-
-
-            /* Foto inladen */
-
-            const reader =
-                new FileReader();
-
-
-            reader.onload =
-                function(event) {
-
-                    imagePreview.src =
-                        event.target.result;
-
-                    imagePreview.style.display =
-                        "block";
-
-                    uploadContent.style.display =
-                        "none";
-
-                };
-
-
-            reader.readAsDataURL(file);
-
+        if (!file.type.startsWith("image/")) {
+            alert("Selecteer een geldige afbeelding.");
+            return;
         }
-    );
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            imagePreview.src = event.target.result;
+            imagePreview.style.display  = "block";
+            uploadContent.style.display = "none";
+
+            /* Wacht tot de afbeelding geladen is, analyseer dan */
+            imagePreview.onload = function () {
+                const gevondenKleur = analyseerAfbeelding(imagePreview);
+
+                if (gevondenKleur) {
+                    /* Stel de kleurfilter automatisch in */
+                    const kleurSelect = document.getElementById("colorFilter");
+                    let gevonden = false;
+                    for (let i = 0; i < kleurSelect.options.length; i++) {
+                        if (kleurSelect.options[i].value === gevondenKleur) {
+                            kleurSelect.selectedIndex = i;
+                            gevonden = true;
+                            break;
+                        }
+                    }
+
+                    /* Toon wat gedetecteerd werd */
+                    const kleurNaam = gevondenKleur.charAt(0).toUpperCase() + gevondenKleur.slice(1);
+                    toonFotoStatus(
+                        "📷 Foto geanalyseerd · Dominante kleur: " + kleurNaam +
+                        (gevonden ? " · Kleurfilter automatisch ingesteld" : "")
+                    );
+
+                    /* Voer de matcher uit */
+                    findMatches();
+                } else {
+                    toonFotoStatus("📷 Foto geladen · Pas je filters aan en klik op 'Vind mijn matches'.");
+                }
+            };
+        };
+
+        reader.readAsDataURL(file);
+    });
 
 
 
@@ -1753,58 +1844,27 @@
 
     function resetMatcher() {
 
+        document.getElementById("colorFilter").value = "all";
+        document.getElementById("typeFilter").value  = "all";
+        document.getElementById("styleFilter").value = "all";
+        document.getElementById("priceFilter").value = "all";
 
-        document
-            .getElementById("colorFilter")
-            .value =
-            "all";
+        /* Foto preview resetten */
+        imagePreview.src           = "";
+        imagePreview.style.display = "none";
+        uploadContent.style.display = "block";
+        photoInput.value            = "";
 
+        /* Statusregel verbergen */
+        toonFotoStatus("");
 
-        document
-            .getElementById("typeFilter")
-            .value =
-            "all";
+        const products = document.querySelectorAll(".product");
+        products.forEach(function(product) {
+            product.style.display = "";
+        });
 
-
-        document
-            .getElementById("styleFilter")
-            .value =
-            "all";
-
-
-        document
-            .getElementById("priceFilter")
-            .value =
-            "all";
-
-
-        const products =
-            document.querySelectorAll(
-                ".product"
-            );
-
-
-        products.forEach(
-            function(product) {
-
-                product.style.display =
-                    "";
-
-            }
-        );
-
-
-        document
-            .getElementById("resultCount")
-            .innerText =
-            "6 matches gevonden";
-
-
-        document
-            .getElementById("noResults")
-            .style.display =
-            "none";
-
+        document.getElementById("resultCount").innerText = document.querySelectorAll(".product").length + " artikelen";
+        document.getElementById("noResults").style.display = "none";
     }
 
 
@@ -1857,20 +1917,20 @@
 
 </script>
 
-<script src="products.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="products.js"></script>
 <script>
-    const sb = supabase.createClient(
-        "https://gpjaxsppsggzlmdsnxvy.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwamF4c3Bwc2dnemxtZHNueHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzkwMzgsImV4cCI6MjEwNTIxNTAzOH0.ZpSxSYPyAP6eUPgVdLK-MBmeDBbLD7JM9qk-32ow-cY"
-    );
-    sb.auth.getSession().then(({ data }) => {
-        if (data.session) {
-            document.getElementById('navAuthLink').style.display     = 'none';
-            document.getElementById('navSettingsLink').style.display = 'inline';
-        }
-    });
+    if (typeof supabase !== "undefined") {
+        supabase.createClient(
+            "https://gpjaxsppsggzlmdsnxvy.supabase.co",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwamF4c3Bwc2dnemxtZHNueHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzkwMzgsImV4cCI6MjEwNTIxNTAzOH0.ZpSxSYPyAP6eUPgVdLK-MBmeDBbLD7JM9qk-32ow-cY"
+        ).auth.getSession().then(function(res) {
+            if (res.data.session) {
+                document.getElementById('navAuthLink').style.display     = 'none';
+                document.getElementById('navSettingsLink').style.display = 'inline';
+            }
+        });
+    }
 </script>
 
 </body>
