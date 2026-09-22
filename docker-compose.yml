@@ -1,5 +1,61 @@
 services:
+
+  # ================================
+  # FRONT-END — nginx + PHP
+  # ================================
   web:
     build: .
     ports:
       - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=gapa
+      - DB_USER=gapa
+      - DB_PASSWORD=gapa_lokaal
+
+  # ================================
+  # DATABASE — PostgreSQL
+  # ================================
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       gapa
+      POSTGRES_USER:     gapa
+      POSTGRES_PASSWORD: gapa_lokaal
+    volumes:
+      - gapa_db_data:/var/lib/postgresql/data
+      - ./supabase/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gapa -d gapa"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ================================
+  # DATABASE BEHEER — pgAdmin
+  # Alleen voor de beheerder/beoordelaar
+  # Bereikbaar op http://localhost:5050
+  # Login: admin@gapa.nl / gapa_admin
+  # ================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL:    admin@gapa.nl
+      PGADMIN_DEFAULT_PASSWORD: gapa_admin
+    ports:
+      - "5050:80"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  gapa_db_data:
+    driver: local
