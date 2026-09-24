@@ -1515,22 +1515,7 @@
 
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="products.js"></script>
-    <script>
-        /* Nav aanpassen op basis van sessie — wordt ook door products.js gedaan maar voor de zekerheid */
-        if (typeof supabase !== "undefined") {
-            supabase.createClient(
-                "https://gpjaxsppsggzlmdsnxvy.supabase.co",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwamF4c3Bwc2dnemxtZHNueHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzkwMzgsImV4cCI6MjEwNTIxNTAzOH0.ZpSxSYPyAP6eUPgVdLK-MBmeDBbLD7JM9qk-32ow-cY"
-            ).auth.getSession().then(function(res) {
-                if (res.data.session) {
-                    document.getElementById('navAuthLink').style.display     = 'none';
-                    document.getElementById('navSettingsLink').style.display = 'inline';
-                }
-            });
-        }
-    </script>
 
 </body>
 

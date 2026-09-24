@@ -799,9 +799,6 @@
      SUPABASE SDK
 ========================= -->
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
-
 <!-- =========================
      JAVASCRIPT
 ========================= -->
@@ -809,42 +806,33 @@
 <script>
 
     /* =========================
-       SUPABASE CLIENT
-    ========================= */
-
-    const SUPABASE_URL  = "https://gpjaxsppsggzlmdsnxvy.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwamF4c3Bwc2dnemxtZHNueHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzkwMzgsImV4cCI6MjEwNTIxNTAzOH0.ZpSxSYPyAP6eUPgVdLK-MBmeDBbLD7JM9qk-32ow-cY";
-
-    const { createClient } = supabase;
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
-
-    /* Als er al een sessie is, direct naar home */
-    sb.auth.getSession().then(({ data }) => {
-        if (data.session) {
-            window.location.replace("../index.html");
-        }
-    });
-
-
-    /* =========================
        HULPFUNCTIES
     ========================= */
 
     function setLoading(button, loading) {
-        button.disabled = loading;
+        button.disabled    = loading;
         button.textContent = loading ? "Even geduld..." : button.dataset.label;
     }
 
     function showError(id, text) {
-        const el = document.getElementById(id);
-        el.textContent = text;
-        el.style.display = "block";
+        const el          = document.getElementById(id);
+        el.textContent    = text;
+        el.style.display  = "block";
     }
 
     function hideError(id) {
-        const el = document.getElementById(id);
-        el.style.display = "none";
+        document.getElementById(id).style.display = "none";
     }
+
+    /* Al ingelogd? Dan direct naar home */
+    fetch("/api/auth/session.php", { credentials: "same-origin" })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.authenticated) {
+                window.location.replace("../index.html");
+            }
+        })
+        .catch(function() {});
 
 
     /* =========================
@@ -865,23 +853,27 @@
             hideError("errorMessage");
             setLoading(loginBtn, true);
 
-            const { error } = await sb.auth.signInWithPassword({ email, password });
+            try {
+                const response = await fetch("/api/auth/login.php", {
+                    method:      "POST",
+                    credentials: "same-origin",
+                    headers:     { "Content-Type": "application/json" },
+                    body:        JSON.stringify({ email, password })
+                });
+                const result = await response.json();
+                setLoading(loginBtn, false);
 
-            setLoading(loginBtn, false);
+                if (!response.ok) {
+                    showError("errorMessage", result.message || "Inloggen is niet gelukt.");
+                    return;
+                }
 
-            if (error) {
-                /* Vertaal de meest voorkomende Supabase foutmeldingen */
-                const meldingen = {
-                    "Invalid login credentials": "Het e-mailadres of wachtwoord is niet correct.",
-                    "Email not confirmed":        "Bevestig eerst je e-mailadres via de link in je inbox.",
-                    "Too many requests":          "Te veel pogingen. Wacht even en probeer het opnieuw."
-                };
-                showError("errorMessage", meldingen[error.message] || error.message);
-                return;
+                window.location.replace("../index.html");
+
+            } catch (e) {
+                setLoading(loginBtn, false);
+                showError("errorMessage", "Kan de server niet bereiken. Controleer of Docker draait.");
             }
-
-            /* Inloggen geslaagd → terug naar home */
-            window.location.replace("../index.html");
         });
 
 
@@ -902,10 +894,9 @@
             const confirmation = document.getElementById("registerPasswordConfirmation").value;
             const message      = document.getElementById("registerMessage");
 
-            /* Reset */
-            message.style.display = "none";
+            message.style.display         = "none";
             message.style.borderLeftColor = "#111111";
-            message.style.color = "#111111";
+            message.style.color           = "#111111";
 
             if (password !== confirmation) {
                 message.textContent   = "De wachtwoorden komen niet overeen.";
@@ -915,28 +906,48 @@
 
             setLoading(registerBtn, true);
 
-            const { error } = await sb.auth.signUp({ email, password });
+            try {
+                const response = await fetch("/api/auth/register.php", {
+                    method:      "POST",
+                    credentials: "same-origin",
+                    headers:     { "Content-Type": "application/json" },
+                    body:        JSON.stringify({ email, password })
+                });
+                const result = await response.json();
+                setLoading(registerBtn, false);
 
-            setLoading(registerBtn, false);
+                message.textContent   = result.message;
+                message.style.display = "block";
 
-            if (error) {
-                message.textContent        = error.message;
+                if (!response.ok) {
+                    message.style.borderLeftColor = "#a00000";
+                    message.style.color           = "#a00000";
+                    return;
+                }
+
+                document.getElementById("registerForm").reset();
+                setTimeout(function() { showLoginForm(); }, 1500);
+
+            } catch (e) {
+                setLoading(registerBtn, false);
+                message.textContent        = "Kan de server niet bereiken. Controleer of Docker draait.";
                 message.style.borderLeftColor = "#a00000";
                 message.style.color           = "#a00000";
                 message.style.display         = "block";
-                return;
             }
-
-            /* Geslaagd: toon bevestigingsbericht */
-            message.textContent   = "Account aangemaakt! Controleer je inbox en bevestig je e-mailadres om in te loggen.";
-            message.style.display = "block";
-            document.getElementById("registerForm").reset();
         });
 
 
     /* =========================
        FORMULIER WISSELEN
     ========================= */
+
+    function showLoginForm() {
+        document.getElementById("loginForm").style.display    = "flex";
+        document.getElementById("registerForm").style.display = "none";
+        document.querySelector(".login-header h1").textContent = "Inloggen";
+        document.getElementById("registerLink").textContent   = "Account aanmaken \u2192";
+    }
 
     document
         .getElementById("registerLink")
@@ -947,17 +958,12 @@
                 document.getElementById("registerForm").style.display === "flex";
 
             if (showingRegister) {
-                /* Terug naar inloggen */
-                document.getElementById("loginForm").style.display    = "flex";
-                document.getElementById("registerForm").style.display = "none";
-                document.querySelector(".login-header h1").textContent = "Inloggen";
-                this.textContent = "Account aanmaken →";
+                showLoginForm();
             } else {
-                /* Naar registreren */
                 document.getElementById("loginForm").style.display    = "none";
                 document.getElementById("registerForm").style.display = "flex";
                 document.querySelector(".login-header h1").textContent = "Account aanmaken";
-                this.textContent = "Terug naar inloggen →";
+                this.textContent = "Terug naar inloggen \u2192";
             }
         });
 
@@ -968,29 +974,9 @@
 
     document
         .querySelector(".forgot-password")
-        .addEventListener("click", async function (event) {
+        .addEventListener("click", function (event) {
             event.preventDefault();
-
-            const email = document.getElementById("email").value.trim();
-
-            if (!email) {
-                showError("errorMessage", "Vul eerst je e-mailadres in, dan sturen we je een resetlink.");
-                return;
-            }
-
-            hideError("errorMessage");
-
-            const { error } = await sb.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.origin + "/Html/login.html"
-            });
-
-            if (error) {
-                showError("errorMessage", error.message);
-            } else {
-                showError("errorMessage", "Resetlink verstuurd! Controleer je inbox.");
-                document.getElementById("errorMessage").style.borderLeftColor = "#111111";
-                document.getElementById("errorMessage").style.color           = "#111111";
-            }
+            alert("Neem contact op met de beheerder om je wachtwoord te resetten.");
         });
 
 </script>

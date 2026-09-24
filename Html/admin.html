@@ -460,49 +460,31 @@
 <!-- =====================
      JAVASCRIPT
 ===================== -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-
-    /* =====================
-       SUPABASE
-    ===================== */
-    const SUPABASE_URL  = "https://gpjaxsppsggzlmdsnxvy.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwamF4c3Bwc2dnemxtZHNueHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzkwMzgsImV4cCI6MjEwNTIxNTAzOH0.ZpSxSYPyAP6eUPgVdLK-MBmeDBbLD7JM9qk-32ow-cY";
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-
-    let alleProducten = [];
 
     /* =====================
        AUTH CHECK
     ===================== */
     async function checkToegang() {
-        const { data: sessionData } = await sb.auth.getSession();
-        if (!sessionData.session) {
-            window.location.replace("login.html");
+        const response = await fetch('/api/auth/session.php', { credentials: 'same-origin' });
+        const result   = await response.json();
+
+        if (!result.authenticated) {
+            window.location.replace('login.html');
             return false;
         }
 
-        document.getElementById("adminEmail").textContent =
-            sessionData.session.user.email;
+        document.getElementById('adminEmail').textContent = result.user.email;
 
-        /* Admin check */
-        const { data: adminData } = await sb
-            .from("admins")
-            .select("user_id")
-            .eq("user_id", sessionData.session.user.id)
-            .maybeSingle();
-
-        if (!adminData) {
+        if (!result.is_admin) {
             document.body.innerHTML =
-                "<div style='padding:80px; text-align:center;'>" +
+                "<div style='padding:80px;text-align:center;'>" +
                 "<h2>Geen toegang</h2>" +
-                "<p style='color:#777; margin-top:12px;'>Dit paneel is alleen voor beheerders.</p>" +
-                "<a href='collectie.html' style='display:inline-block; margin-top:24px; " +
-                "padding:12px 20px; background:#111; color:#fff; font-weight:bold;'>" +
-                "Terug naar collectie</a></div>";
+                "<p style='color:#777;margin-top:12px;'>Dit paneel is alleen voor beheerders.</p>" +
+                "<a href='collectie.html' style='display:inline-block;margin-top:24px;padding:12px 20px;background:#111;color:#fff;font-weight:bold;'>Terug naar collectie</a>" +
+                "</div>";
             return false;
         }
-
         return true;
     }
 
@@ -510,26 +492,34 @@
        PRODUCTEN LADEN
     ===================== */
     async function laadProducten() {
-        document.getElementById("laadStatus").style.display = "block";
-        document.getElementById("productTabel").style.display = "none";
+        document.getElementById('laadStatus').style.display  = 'block';
+        document.getElementById('productTabel').style.display = 'none';
 
-        const { data, error } = await sb
-            .from("products")
-            .select("id, name, category, color, image_path, stock, is_available")
-            .order("id");
+        const response = await fetch('/api/products/get_products.php', { credentials: 'same-origin' });
+        const data     = await response.json();
 
-        if (error || !data) {
-            document.getElementById("laadStatus").textContent =
-                "Fout bij laden: " + (error ? error.message : "onbekende fout");
+        if (!data.success || !data.products) {
+            document.getElementById('laadStatus').textContent = 'Fout bij laden van producten.';
             return;
         }
 
-        alleProducten = data;
-        document.getElementById("laadStatus").style.display = "none";
-        document.getElementById("productTabel").style.display = "table";
+        alleProducten = data.products.map(function(p) {
+            return {
+                id:          parseInt(p.id),
+                name:        p.name,
+                category:    p.category,
+                color:       p.color,
+                image_path:  p.image_path,
+                stock:       parseInt(p.stock),
+                is_available: p.is_available,
+            };
+        });
 
-        updateStats(data);
-        renderTabel(data);
+        document.getElementById('laadStatus').style.display   = 'none';
+        document.getElementById('productTabel').style.display = 'table';
+
+        updateStats(alleProducten);
+        renderTabel(alleProducten);
     }
 
     /* =====================
@@ -707,7 +697,6 @@
         const input    = document.getElementById("input-" + productId);
         const statusEl = document.getElementById("status-" + productId);
         const saveBtn  = document.getElementById("save-" + productId);
-
         if (!input) return;
 
         const nieuw = Math.max(0, parseInt(input.value) || 0);
@@ -716,13 +705,22 @@
         statusEl.textContent = "Opslaan...";
         statusEl.className   = "save-status";
 
-        const { error } = await sb
-            .from("products")
-            .update({ stock: nieuw, updated_at: new Date().toISOString() })
-            .eq("id", productId);
+        try {
+            const response = await fetch("/api/products/update_stock.php", {
+                method:      "POST",
+                credentials: "same-origin",
+                headers:     { "Content-Type": "application/json" },
+                body:        JSON.stringify({ id: productId, stock: nieuw }),
+            });
+            const result = await response.json();
 
-        if (error) {
-            statusEl.textContent = "✗ Fout";
+            if (!result.success) {
+                statusEl.textContent = "\u2717 " + result.message;
+                statusEl.className   = "save-status err";
+                return;
+            }
+        } catch (e) {
+            statusEl.textContent = "\u2717 Geen verbinding";
             statusEl.className   = "save-status err";
             return;
         }
@@ -734,21 +732,16 @@
             badge.className   = "stock-badge " + stockClass(nieuw);
         }
 
-        /* Lokale data bijwerken */
         const local = alleProducten.find(function(p) { return p.id === productId; });
         if (local) local.stock = nieuw;
 
-        /* Stats herberekenen */
         updateStats(alleProducten);
 
-        /* UI resetten */
-        statusEl.textContent = "✓ Opgeslagen";
+        statusEl.textContent = "\u2713 Opgeslagen";
         statusEl.className   = "save-status ok";
         if (saveBtn) saveBtn.classList.remove("zichtbaar");
 
-        setTimeout(function() {
-            if (statusEl) statusEl.textContent = "";
-        }, 2500);
+        setTimeout(function() { if (statusEl) statusEl.textContent = ""; }, 2500);
     }
 
     /* =====================
@@ -787,13 +780,14 @@
        UITLOGGEN
     ===================== */
     document.getElementById("logoutBtn").addEventListener("click", async function() {
-        await sb.auth.signOut();
+        await fetch("/api/auth/logout.php", { method: "POST", credentials: "same-origin" });
         window.location.replace("login.html");
     });
 
     /* =====================
        OPSTARTEN
     ===================== */
+    let alleProducten = [];
     (async function() {
         const toegang = await checkToegang();
         if (toegang) await laadProducten();

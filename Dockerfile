@@ -1,6 +1,7 @@
 FROM php:8.3-fpm-alpine
 
 RUN apk add --no-cache nginx \
+    && docker-php-ext-install pdo_mysql \
     && mkdir -p /run/nginx /var/cache/nginx/client_temp \
     && chown -R nginx:nginx /var/cache/nginx /run/nginx
 
@@ -10,6 +11,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY nginx-main.conf /etc/nginx/nginx.conf
 COPY index.html *.jpg *.jpeg *.png *.webp /usr/share/nginx/html/
 COPY Html/ /usr/share/nginx/html/Html/
+COPY Database/ /var/www/database/
 
 EXPOSE 8080
 

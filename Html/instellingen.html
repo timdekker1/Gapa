@@ -43,27 +43,35 @@
             <div class="message" id="message" role="status"></div>
         </section>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script>
-        const SUPABASE_URL  = "https://gpjaxsppsggzlmdsnxvy.supabase.co";
-        const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwamF4c3Bwc2dnemxtZHNueHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzkwMzgsImV4cCI6MjEwNTIxNTAzOH0.ZpSxSYPyAP6eUPgVdLK-MBmeDBbLD7JM9qk-32ow-cY";
-        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-
-        /* Alleen toegankelijk als ingelogd */
-        sb.auth.getSession().then(({ data }) => {
-            if (!data.session) {
-                window.location.replace("login.html");
+        async function loadAccount() {
+            const response = await fetch('/api/auth/session.php', { credentials: 'same-origin' });
+            const result   = await response.json();
+            if (!result.authenticated) {
+                window.location.replace('/Html/login.html');
                 return;
             }
-            const user = data.session.user;
-            document.getElementById('accountEmail').textContent = user.email;
-        });
+            document.getElementById('accountEmail').textContent = result.user.email;
+
+            /* Admin-link tonen */
+            if (result.is_admin) {
+                const adminLink       = document.createElement('a');
+                adminLink.href        = 'admin.html';
+                adminLink.textContent = 'Ga naar beheer paneel \u2192';
+                adminLink.style.cssText = 'display:inline-block; margin-top:16px; font-size:13px; font-weight:bold;';
+                document.querySelector('section').appendChild(adminLink);
+            }
+        }
 
         document.getElementById('logoutButton').addEventListener('click', async function () {
-            this.disabled = true;
+            this.disabled    = true;
             this.textContent = 'Uitloggen...';
-            await sb.auth.signOut();
-            window.location.replace("login.html");
+            await fetch('/api/auth/logout.php', { method: 'POST', credentials: 'same-origin' });
+            window.location.replace('/Html/login.html');
+        });
+
+        loadAccount().catch(function() {
+            document.getElementById('message').textContent = 'Accountgegevens konden niet worden geladen.';
         });
     </script>
 </body>
