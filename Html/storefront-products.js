@@ -16,9 +16,9 @@
 
     try {
         const response = await fetch("/api/products/get_products.php", { credentials: "same-origin" });
-        if (!response.ok) return;
+        if (!response.ok) throw new Error("Product API niet bereikbaar.");
         const data = await response.json();
-        if (!data.success || !Array.isArray(data.products)) return;
+        if (!data.success || !Array.isArray(data.products)) throw new Error("Producten konden niet geladen worden.");
 
         const byImage = new Map(data.products.map(function(product) {
             return [product.image_path.toLowerCase(), product];
@@ -64,6 +64,10 @@
             }
         });
     } catch (error) {
-        /* Keep the static homepage usable if the API is unavailable. */
+        cards.forEach(function(card) {
+            const stock = card.querySelector(".stock");
+            if (stock) stock.textContent = "Voorraad niet beschikbaar";
+        });
+        console.error("Voorraad kon niet uit de database worden geladen.", error);
     }
 })();

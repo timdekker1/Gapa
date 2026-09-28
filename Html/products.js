@@ -71,7 +71,7 @@ let gapaProducts = [
         category: item[3],
         color:    item[4],
         details:  item[5],
-        stock:    5,
+        stock:    null,
     };
 });
 
@@ -81,9 +81,9 @@ let gapaProducts = [
 async function gapaLaadVoorraad() {
     try {
         const response = await fetch("/api/products/get_products.php", { credentials: "same-origin" });
-        if (!response.ok) return;
+        if (!response.ok) throw new Error("Voorraad-API niet bereikbaar.");
         const data = await response.json();
-        if (!data.success || !data.products) return;
+        if (!data.success || !data.products) throw new Error("Voorraad kon niet geladen worden.");
 
         gapaProducts = data.products.map(function(product) {
             return {
@@ -100,7 +100,7 @@ async function gapaLaadVoorraad() {
             };
         });
     } catch (e) {
-        /* Stille fout — lokale data wordt gebruikt */
+        console.error("Voorraad kon niet uit de database worden geladen.", e);
     }
 }
 
@@ -131,6 +131,9 @@ function gapaLabel(value) {
 }
 
 function gapaStockLabel(stock) {
+    if (stock === null || stock === undefined || !Number.isFinite(Number(stock))) {
+        return { tekst: "Voorraad niet beschikbaar", kleur: "#666" };
+    }
     if (stock === 0) return { tekst: "Uitverkocht",                    kleur: "#a00000" };
     if (stock <= 2)  return { tekst: "Nog " + stock + " op voorraad", kleur: "#c05000" };
     return { tekst: "Op voorraad: " + stock,                          kleur: "#2a7a2a" };
