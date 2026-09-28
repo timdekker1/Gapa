@@ -20,3 +20,16 @@ De webcontainer serveert de website via Nginx en PHP-FPM. De oude lokale databas
 ## Docker-compose down  (terminal)
 ## PUSH OP GIT
 ## docker-compose up --build    (terminal)
+
+
+Gebruikersnaam/wachtwoord die je normaal gebruikt in de app zijn:
+
+Server: db
+Gebruiker: gapa
+Wachtwoord: gapa_dev_password
+Als je liever via de root account inlogt:
+
+Gebruiker: root
+Wachtwoord: root_dev_password
+
+(http://localhost:8081)

@@ -187,6 +187,125 @@
         .btn-dark  { background: #111; color: #fff; }
         .btn-light { background: #fff; color: #111; border: 1px solid #d5d5d5; }
 
+        .action-btn {
+            padding: 7px 10px;
+            border: 1px solid #d5d5d5;
+            background: #fff;
+            color: #111;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .action-btn.delete {
+            background: #fff0f0;
+            border-color: #d89a9a;
+            color: #8a1f1f;
+        }
+
+        .action-btn.delete:hover { background: #ffe2e2; }
+
+        /* ---- MODAL ---- */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .modal.show { display: flex; }
+
+        .modal-card {
+            background: #fff;
+            width: min(560px, 100%);
+            border: 1px solid #e2e2e2;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+        }
+
+        .modal-header,
+        .modal-footer {
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #111;
+            color: #fff;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-close {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .modal-body {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field.full { grid-column: 1 / -1; }
+
+        .field label {
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #555;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            border: 1px solid #d5d5d5;
+            padding: 10px 12px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #fff;
+            outline: none;
+        }
+
+        .field textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus { border-color: #111; }
+
+        .modal-footer {
+            background: #fff;
+            border-top: 1px solid #e2e2e2;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-footer .btn {
+            padding: 10px 16px;
+        }
+
         /* ---- TABEL ---- */
         .table-wrap {
             background: #fff;
@@ -422,6 +541,7 @@
             <option value="leeg">Uitverkocht (0)</option>
         </select>
         <div class="toolbar-spacer"></div>
+        <button class="btn btn-dark" onclick="openAddProductModal()">+ Nieuw product</button>
         <button class="btn btn-light" onclick="allesHerladen()">↺ Herladen</button>
     </div>
 
@@ -439,6 +559,7 @@
                     <th>VOORRAAD</th>
                     <th>AANPASSEN</th>
                     <th>STATUS</th>
+                    <th>ACTIE</th>
                 </tr>
             </thead>
             <tbody id="tabelBody"></tbody>
@@ -447,6 +568,56 @@
 
 </main>
 
+<div id="addProductModal" class="modal" aria-modal="true" role="dialog">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2>Nieuw product toevoegen</h2>
+            <button type="button" class="modal-close" aria-label="Sluiten" onclick="closeAddProductModal()">×</button>
+        </div>
+
+        <form id="addProductForm">
+            <div class="modal-body">
+                <div class="field full">
+                    <label for="productNaam">Naam</label>
+                    <input id="productNaam" name="name" type="text" required>
+                </div>
+
+                <div class="field">
+                    <label for="productCategorie">Categorie</label>
+                    <select id="productCategorie" name="category" required>
+                        <option value="kleding">Kleding</option>
+                        <option value="tassen">Tassen</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="productKleur">Kleur</label>
+                    <input id="productKleur" name="color" type="text" required>
+                </div>
+
+                <div class="field full">
+                    <label for="productDetails">Omschrijving</label>
+                    <textarea id="productDetails" name="details" required></textarea>
+                </div>
+
+                <div class="field">
+                    <label for="productStock">Voorraad</label>
+                    <input id="productStock" name="stock" type="number" min="0" value="5" required>
+                </div>
+
+                <div class="field">
+                    <label for="productAfbeelding">Afbeelding (pad)</label>
+                    <input id="productAfbeelding" name="image_path" type="text" value="placeholder-product.jpg" required>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" onclick="closeAddProductModal()">Annuleren</button>
+                <button type="submit" class="btn btn-dark">Opslaan</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <!-- =====================
      FOOTER
@@ -654,8 +825,53 @@
             tdStatus.appendChild(statusEl);
             tr.appendChild(tdStatus);
 
+            const tdActie = document.createElement("td");
+            const verwijderBtn = document.createElement("button");
+            verwijderBtn.type = "button";
+            verwijderBtn.className = "action-btn delete";
+            verwijderBtn.textContent = "Verwijderen";
+            verwijderBtn.addEventListener("click", function() {
+                verwijderProduct(product.id);
+            });
+            tdActie.appendChild(verwijderBtn);
+            tr.appendChild(tdActie);
+
             tbody.appendChild(tr);
         });
+    }
+
+    function openAddProductModal() {
+        document.getElementById("addProductModal").classList.add("show");
+    }
+
+    function closeAddProductModal() {
+        document.getElementById("addProductModal").classList.remove("show");
+        document.getElementById("addProductForm").reset();
+        document.getElementById("productStock").value = "5";
+    }
+
+    async function verwijderProduct(productId) {
+        const ok = confirm("Weet je zeker dat je dit product wilt verwijderen?");
+        if (!ok) return;
+
+        try {
+            const response = await fetch("/api/products/delete_product.php", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: productId })
+            });
+            const result = await response.json();
+
+            if (!result.success) {
+                alert(result.message || "Verwijderen mislukt.");
+                return;
+            }
+
+            await laadProducten();
+        } catch (error) {
+            alert("Verwijderen is mislukt. Probeer het opnieuw.");
+        }
     }
 
     /* =====================
@@ -782,6 +998,46 @@
     document.getElementById("logoutBtn").addEventListener("click", async function() {
         await fetch("/api/auth/logout.php", { method: "POST", credentials: "same-origin" });
         window.location.replace("login.html");
+    });
+
+    document.getElementById("addProductForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const payload = {
+            name:        (formData.get("name") || "").toString().trim(),
+            category:   (formData.get("category") || "").toString().trim(),
+            color:      (formData.get("color") || "").toString().trim(),
+            details:    (formData.get("details") || "").toString().trim(),
+            stock:      Math.max(0, parseInt(formData.get("stock") || "0", 10) || 0),
+            image_path: (formData.get("image_path") || "placeholder-product.jpg").toString().trim() || "placeholder-product.jpg"
+        };
+
+        if (!payload.name || !payload.color || !payload.details) {
+            alert("Vul alle velden in.");
+            return;
+        }
+
+        try {
+            const response = await fetch("/api/products/add_product.php", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+
+            if (!result.success) {
+                alert(result.message || "Toevoegen mislukt.");
+                return;
+            }
+
+            closeAddProductModal();
+            await laadProducten();
+        } catch (error) {
+            alert("Toevoegen is mislukt. Probeer het opnieuw.");
+        }
     });
 
     /* =====================

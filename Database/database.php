@@ -51,10 +51,13 @@ try {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     ");
 
-    /* Voorraad kolom toevoegen als die nog niet bestaat */
+    /* Voorraad en beschikbaarheidskolommen toevoegen als die nog niet bestaan */
     $prodCols = $pdo->query("SHOW COLUMNS FROM products")->fetchAll(PDO::FETCH_COLUMN);
     if (!in_array('stock', $prodCols)) {
         $pdo->exec("ALTER TABLE products ADD COLUMN stock INT NOT NULL DEFAULT 5 AFTER details");
+    }
+    if (!in_array('is_available', $prodCols)) {
+        $pdo->exec("ALTER TABLE products ADD COLUMN is_available TINYINT(1) NOT NULL DEFAULT 1 AFTER stock");
     }
 
     /* Producten invoeren als de tabel leeg is */
