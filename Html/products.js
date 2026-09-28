@@ -6,7 +6,7 @@
 /* ============================================
    LOKALE PRODUCT DATA (fallback als API uitvalt)
 ============================================ */
-const gapaProducts = [
+let gapaProducts = [
     [1,  "longsleevezwartgrijs.jpeg",                              "Lange mouwen longsleeve",             "kleding", "grijs",  "Lange mouwen, grijs met zwarte mouwen"],
     [2,  "dameskraagdasdetail.jpg",                                "Dames shirt met kraag",               "kleding", "roze",   "Dames shirt lange mouw met kraag, roze/bruin"],
     [3,  "longsleeveblauwgrijs.jpg",                               "Lange mouwen longsleeve",             "kleding", "blauw",  "Lange mouwen, donkerblauw met grijze mouwen"],
@@ -85,14 +85,19 @@ async function gapaLaadVoorraad() {
         const data = await response.json();
         if (!data.success || !data.products) return;
 
-        const map = {};
-        data.products.forEach(function(p) { map[p.id] = p; });
-
-        gapaProducts.forEach(function(product) {
-            if (map[product.id] !== undefined) {
-                product.stock        = parseInt(map[product.id].stock);
-                product.is_available = map[product.id].is_available;
-            }
+        gapaProducts = data.products.map(function(product) {
+            return {
+                id: Number(product.id),
+                number: Number(product.id),
+                image: "../" + product.image_path,
+                name: product.name,
+                category: product.category,
+                color: product.color,
+                details: product.details,
+                price: product.price,
+                stock: Number(product.stock),
+                is_available: Number(product.is_available),
+            };
         });
     } catch (e) {
         /* Stille fout — lokale data wordt gebruikt */
@@ -119,7 +124,7 @@ async function gapaCheckAdmin() {
 /* ============================================
    HULPFUNCTIES
 ============================================ */
-const gapaColors = [...new Set(gapaProducts.map(function(p) { return p.color; }))].sort();
+let gapaColors = [...new Set(gapaProducts.map(function(p) { return p.color; }))].sort();
 
 function gapaLabel(value) {
     return value.charAt(0).toUpperCase() + value.slice(1);
@@ -129,6 +134,190 @@ function gapaStockLabel(stock) {
     if (stock === 0) return { tekst: "Uitverkocht",                    kleur: "#a00000" };
     if (stock <= 2)  return { tekst: "Nog " + stock + " op voorraad", kleur: "#c05000" };
     return { tekst: "Op voorraad: " + stock,                          kleur: "#2a7a2a" };
+}
+
+let gapaProductDialog;
+
+function gapaEnsureProductDialog() {
+    if (gapaProductDialog) return;
+
+    const style = document.createElement("style");
+    style.textContent = `
+        .gapa-product-dialog {
+            width: min(960px, calc(100vw - 32px));
+            max-width: none;
+            max-height: calc(100vh - 32px);
+            padding: 0;
+            border: 0;
+            color: #171717;
+            background: #fff;
+            box-shadow: 0 18px 60px rgba(0,0,0,.24);
+        }
+        .gapa-product-dialog::backdrop { background: rgba(17,17,17,.65); }
+        .gapa-detail-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+        .gapa-detail-image { width: 100%; height: 100%; min-height: 480px; max-height: 760px; object-fit: cover; background: #eee; }
+        .gapa-detail-content { padding: 32px; overflow-y: auto; max-height: calc(100vh - 32px); }
+        .gapa-detail-close { display: block; margin-left: auto; width: 36px; height: 36px; border: 1px solid #ccc; background: #fff; font-size: 22px; cursor: pointer; }
+        .gapa-detail-eyebrow { margin: 18px 0 8px; color: #777; font-size: 11px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
+        .gapa-detail-title { margin: 0 0 10px; font-size: 30px; line-height: 1.15; }
+        .gapa-detail-meta { color: #666; font-size: 13px; }
+        .gapa-detail-stock { margin: 18px 0; font-size: 13px; font-weight: bold; }
+        .gapa-detail-description { margin: 0 0 28px; color: #333; font-size: 15px; line-height: 1.65; white-space: pre-line; }
+        .gapa-question-section { border-top: 1px solid #ddd; padding-top: 22px; }
+        .gapa-question-section h3 { margin: 0 0 14px; font-size: 18px; }
+        .gapa-question-item { padding: 12px 0; border-top: 1px solid #eee; font-size: 13px; line-height: 1.55; }
+        .gapa-question-item strong { display: block; margin-bottom: 4px; }
+        .gapa-question-form { display: grid; gap: 11px; margin-top: 18px; }
+        .gapa-question-form label { display: grid; gap: 5px; font-size: 12px; font-weight: bold; }
+        .gapa-question-form input, .gapa-question-form textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 0; font: inherit; font-size: 14px; }
+        .gapa-question-form textarea { min-height: 90px; resize: vertical; }
+        .gapa-question-form button { justify-self: start; padding: 11px 16px; border: 0; background: #111; color: #fff; font: inherit; font-size: 13px; font-weight: bold; cursor: pointer; }
+        .gapa-question-status { min-height: 18px; margin: 0; font-size: 12px; }
+        @media (max-width: 700px) {
+            .gapa-detail-grid { grid-template-columns: 1fr; }
+            .gapa-detail-image { min-height: 0; height: min(48vh, 360px); }
+            .gapa-detail-content { padding: 20px; max-height: none; overflow: visible; }
+            .gapa-detail-title { font-size: 25px; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    gapaProductDialog = document.createElement("dialog");
+    gapaProductDialog.className = "gapa-product-dialog";
+    gapaProductDialog.setAttribute("aria-labelledby", "gapaDetailTitle");
+
+    const grid = document.createElement("div");
+    grid.className = "gapa-detail-grid";
+    const image = document.createElement("img");
+    image.className = "gapa-detail-image";
+    image.id = "gapaDetailImage";
+    const content = document.createElement("div");
+    content.className = "gapa-detail-content";
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.className = "gapa-detail-close";
+    closeButton.textContent = "×";
+    closeButton.setAttribute("aria-label", "Productdetails sluiten");
+    closeButton.addEventListener("click", function() { gapaProductDialog.close(); });
+
+    const eyebrow = document.createElement("p");
+    eyebrow.className = "gapa-detail-eyebrow";
+    eyebrow.id = "gapaDetailEyebrow";
+    const title = document.createElement("h2");
+    title.className = "gapa-detail-title";
+    title.id = "gapaDetailTitle";
+    const meta = document.createElement("p");
+    meta.className = "gapa-detail-meta";
+    meta.id = "gapaDetailMeta";
+    const stock = document.createElement("p");
+    stock.className = "gapa-detail-stock";
+    stock.id = "gapaDetailStock";
+    const description = document.createElement("p");
+    description.className = "gapa-detail-description";
+    description.id = "gapaDetailDescription";
+
+    const questionSection = document.createElement("section");
+    questionSection.className = "gapa-question-section";
+    const questionHeading = document.createElement("h3");
+    questionHeading.textContent = "Vragen over dit product";
+    const questionList = document.createElement("div");
+    questionList.id = "gapaQuestionList";
+    questionSection.append(questionHeading, questionList);
+
+    const form = document.createElement("form");
+    form.className = "gapa-question-form";
+    form.id = "gapaQuestionForm";
+    form.innerHTML = `
+        <label>Naam<input name="name" autocomplete="name" maxlength="120" required></label>
+        <label>E-mailadres<input name="email" type="email" autocomplete="email" maxlength="255" required></label>
+        <label>Je vraag<textarea name="question" minlength="5" maxlength="4000" required></textarea></label>
+        <p class="gapa-question-status" id="gapaQuestionStatus" role="status" aria-live="polite"></p>
+        <button type="submit">Vraag versturen</button>
+    `;
+    form.addEventListener("submit", gapaSubmitQuestion);
+
+    content.append(closeButton, eyebrow, title, meta, stock, description, questionSection, form);
+    grid.append(image, content);
+    gapaProductDialog.appendChild(grid);
+    gapaProductDialog.addEventListener("click", function(event) {
+        if (event.target === gapaProductDialog) gapaProductDialog.close();
+    });
+    document.body.appendChild(gapaProductDialog);
+}
+
+function gapaOpenProduct(product) {
+    gapaEnsureProductDialog();
+    const stock = gapaStockLabel(product.stock);
+    document.getElementById("gapaDetailImage").src = product.image;
+    document.getElementById("gapaDetailImage").alt = product.name;
+    document.getElementById("gapaDetailEyebrow").textContent = gapaLabel(product.category) + " · " + gapaLabel(product.color);
+    document.getElementById("gapaDetailTitle").textContent = product.name;
+    document.getElementById("gapaDetailMeta").textContent = "Artikel " + product.number;
+    const stockElement = document.getElementById("gapaDetailStock");
+    stockElement.textContent = stock.tekst;
+    stockElement.style.color = stock.kleur;
+    document.getElementById("gapaDetailDescription").textContent = product.details;
+    document.getElementById("gapaQuestionForm").dataset.productId = product.id;
+    document.getElementById("gapaQuestionForm").reset();
+    document.getElementById("gapaQuestionStatus").textContent = "";
+    document.getElementById("gapaQuestionList").textContent = "Antwoorden laden...";
+    gapaProductDialog.showModal();
+    gapaLoadProductQuestions(product.id);
+}
+
+async function gapaLoadProductQuestions(productId) {
+    const list = document.getElementById("gapaQuestionList");
+    try {
+        const response = await fetch("/api/products/get_questions.php?product_id=" + encodeURIComponent(productId));
+        const data = await response.json();
+        list.replaceChildren();
+        if (!data.success || data.questions.length === 0) {
+            list.textContent = "Nog geen beantwoorde vragen.";
+            return;
+        }
+        data.questions.forEach(function(item) {
+            const entry = document.createElement("article");
+            entry.className = "gapa-question-item";
+            const question = document.createElement("strong");
+            question.textContent = "Vraag: " + item.question;
+            const answer = document.createElement("p");
+            answer.textContent = "Antwoord: " + item.answer;
+            entry.append(question, answer);
+            list.appendChild(entry);
+        });
+    } catch (error) {
+        list.textContent = "Vragen konden niet geladen worden.";
+    }
+}
+
+async function gapaSubmitQuestion(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const status = document.getElementById("gapaQuestionStatus");
+    const submit = form.querySelector("button[type='submit']");
+    const values = new FormData(form);
+    submit.disabled = true;
+    status.textContent = "Versturen...";
+
+    try {
+        const response = await fetch("/api/products/ask_question.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                product_id: Number(form.dataset.productId),
+                name: values.get("name"),
+                email: values.get("email"),
+                question: values.get("question"),
+            }),
+        });
+        const result = await response.json();
+        status.textContent = result.message || "Je vraag kon niet worden verstuurd.";
+        if (result.success) form.reset();
+    } catch (error) {
+        status.textContent = "Geen verbinding. Probeer het later opnieuw.";
+    } finally {
+        submit.disabled = false;
+    }
 }
 
 /* ============================================
@@ -144,6 +333,16 @@ function gapaCreateProduct(product, matcher) {
     card.dataset.style    = product.category;
     card.dataset.number   = product.number;
     card.dataset.id       = product.id;
+    card.tabIndex = 0;
+    card.style.cursor = "pointer";
+    card.setAttribute("aria-label", product.name + ". Bekijk productdetails en stel een vraag.");
+    card.addEventListener("click", function() { gapaOpenProduct(product); });
+    card.addEventListener("keydown", function(event) {
+        if ((event.key === "Enter" || event.key === " ") && event.target === card) {
+            event.preventDefault();
+            gapaOpenProduct(product);
+        }
+    });
 
     if (product.stock === 0) card.style.opacity = "0.55";
 
@@ -160,6 +359,11 @@ function gapaCreateProduct(product, matcher) {
     image.src      = product.image;
     image.alt      = product.name + ": " + product.details;
     image.loading  = "lazy";
+    image.style.cursor = "pointer";
+    image.addEventListener("click", function(event) {
+        event.stopPropagation();
+        window.location.href = "product.html?id=" + encodeURIComponent(product.id);
+    });
     imageBox.appendChild(image);
     card.appendChild(imageBox);
 
@@ -191,10 +395,21 @@ function gapaCreateProduct(product, matcher) {
     stockEl.style.cssText     = "margin-top:10px; font-size:12px; font-weight:bold; color:" + stockInfo.kleur + ";";
     info.appendChild(stockEl);
 
+    const detailsButton = document.createElement("button");
+    detailsButton.type = "button";
+    detailsButton.textContent = "Bekijk productdetails";
+    detailsButton.style.cssText = "margin-top:12px;padding:0;border:0;background:none;color:#111;text-decoration:underline;font-size:12px;font-weight:bold;cursor:pointer;";
+    detailsButton.addEventListener("click", function(event) {
+        event.stopPropagation();
+        window.location.href = "product.html?id=" + encodeURIComponent(product.id);
+    });
+    info.appendChild(detailsButton);
+
     /* Admin knoppen */
     if (gapaIsAdmin) {
         const adminRow        = document.createElement("div");
         adminRow.style.cssText = "display:flex; align-items:center; gap:8px; margin-top:10px;";
+        adminRow.addEventListener("click", function(event) { event.stopPropagation(); });
 
         const minBtn          = document.createElement("button");
         minBtn.textContent    = "\u2212";
@@ -329,6 +544,8 @@ function gapaToonAdminBanner() {
 ============================================ */
 document.addEventListener("DOMContentLoaded", async function() {
     await Promise.all([gapaLaadVoorraad(), gapaCheckAdmin()]);
+    gapaColors = [...new Set(gapaProducts.map(function(product) { return product.color; }))].sort();
+    gapaEnsureProductDialog();
     gapaRenderProducts();
     gapaToonAdminBanner();
 });

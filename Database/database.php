@@ -44,6 +44,7 @@ try {
             category     VARCHAR(50)   NOT NULL,
             color        VARCHAR(50)   NOT NULL,
             details      TEXT          NOT NULL,
+            price        DECIMAL(10,2) NULL DEFAULT NULL,
             stock        INT           NOT NULL DEFAULT 5,
             is_available TINYINT(1)    NOT NULL DEFAULT 1,
             created_at   TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
@@ -56,9 +57,28 @@ try {
     if (!in_array('stock', $prodCols)) {
         $pdo->exec("ALTER TABLE products ADD COLUMN stock INT NOT NULL DEFAULT 5 AFTER details");
     }
+    if (!in_array('price', $prodCols)) {
+        $pdo->exec("ALTER TABLE products ADD COLUMN price DECIMAL(10,2) NULL DEFAULT NULL AFTER details");
+    }
     if (!in_array('is_available', $prodCols)) {
         $pdo->exec("ALTER TABLE products ADD COLUMN is_available TINYINT(1) NOT NULL DEFAULT 1 AFTER stock");
     }
+
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS product_questions (
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            product_id INT UNSIGNED NOT NULL,
+            customer_name VARCHAR(120) NOT NULL,
+            customer_email VARCHAR(255) NOT NULL,
+            question TEXT NOT NULL,
+            answer TEXT NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            answered_at TIMESTAMP NULL DEFAULT NULL,
+            INDEX idx_product_questions_product (product_id),
+            CONSTRAINT fk_product_questions_product
+                FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
 
     /* Producten invoeren als de tabel leeg is */
     $count = $pdo->query("SELECT COUNT(*) FROM products")->fetchColumn();

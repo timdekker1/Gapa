@@ -206,6 +206,18 @@
 
         .action-btn.delete:hover { background: #ffe2e2; }
 
+        .question-inbox { margin: 0 0 32px; }
+        .question-inbox-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+        .question-inbox-header h2 { font-size: 20px; }
+        .question-list { display: grid; gap: 10px; }
+        .question-card { background: #fff; border: 1px solid #e2e2e2; padding: 16px; display: grid; gap: 10px; }
+        .question-card p { font-size: 13px; line-height: 1.5; white-space: pre-line; }
+        .question-card .question-meta { color: #666; font-size: 12px; }
+        .question-answer { width: 100%; min-height: 80px; padding: 10px; border: 1px solid #d5d5d5; font: inherit; resize: vertical; }
+        .question-card-footer { display: flex; align-items: center; gap: 12px; }
+        .question-card-status { font-size: 12px; color: #2a7a2a; }
+        .question-empty { padding: 18px; background: #fff; border: 1px solid #e2e2e2; color: #666; font-size: 13px; }
+
         /* ---- MODAL ---- */
         .modal {
             position: fixed;
@@ -526,6 +538,16 @@
         </div>
     </div>
 
+    <section class="question-inbox" aria-labelledby="questionInboxTitle">
+        <div class="question-inbox-header">
+            <h2 id="questionInboxTitle">Klantvragen</h2>
+            <button class="btn btn-light" type="button" onclick="laadVragen()">Vragen herladen</button>
+        </div>
+        <div id="questionList" class="question-list" aria-live="polite">
+            <div class="question-empty">Vragen laden...</div>
+        </div>
+    </section>
+
     <!-- TOOLBAR -->
     <div class="toolbar">
         <input type="text" id="zoekInput" placeholder="Zoek product..." oninput="filterTabel()">
@@ -558,6 +580,7 @@
                     <th>KLEUR</th>
                     <th>VOORRAAD</th>
                     <th>AANPASSEN</th>
+                    <th>OMSCHRIJVING</th>
                     <th>STATUS</th>
                     <th>ACTIE</th>
                 </tr>
@@ -606,6 +629,11 @@
                 </div>
 
                 <div class="field">
+                    <label for="productPrice">Prijs in euro</label>
+                    <input id="productPrice" name="price" type="number" min="0" step="0.01" placeholder="Leeg = prijs op aanvraag">
+                </div>
+
+                <div class="field">
                     <label for="productAfbeelding">Afbeelding (pad)</label>
                     <input id="productAfbeelding" name="image_path" type="text" value="placeholder-product.jpg" required>
                 </div>
@@ -614,6 +642,31 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" onclick="closeAddProductModal()">Annuleren</button>
                 <button type="submit" class="btn btn-dark">Opslaan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="descriptionModal" class="modal" aria-modal="true" role="dialog">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2 id="descriptionModalTitle">Productomschrijving aanpassen</h2>
+            <button type="button" class="modal-close" aria-label="Sluiten" onclick="closeDescriptionModal()">×</button>
+        </div>
+        <form id="descriptionForm">
+            <div class="modal-body">
+                <div class="field full">
+                    <label for="descriptionInput">Omschrijving</label>
+                    <textarea id="descriptionInput" name="details" maxlength="4000" required></textarea>
+                </div>
+                <div class="field">
+                    <label for="descriptionPrice">Prijs in euro</label>
+                    <input id="descriptionPrice" name="price" type="number" min="0" step="0.01" placeholder="Leeg = prijs op aanvraag">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" onclick="closeDescriptionModal()">Annuleren</button>
+                <button type="submit" class="btn btn-dark">Omschrijving opslaan</button>
             </div>
         </form>
     </div>
@@ -681,6 +734,8 @@
                 category:    p.category,
                 color:       p.color,
                 image_path:  p.image_path,
+                details:     p.details,
+                price:       p.price,
                 stock:       parseInt(p.stock),
                 is_available: p.is_available,
             };
@@ -817,6 +872,17 @@
             tdControl.appendChild(control);
             tr.appendChild(tdControl);
 
+            const tdBeschrijving = document.createElement("td");
+            const beschrijvingBtn = document.createElement("button");
+            beschrijvingBtn.type = "button";
+            beschrijvingBtn.className = "action-btn";
+            beschrijvingBtn.textContent = "Bewerken";
+            beschrijvingBtn.addEventListener("click", function() {
+                openDescriptionModal(product.id);
+            });
+            tdBeschrijving.appendChild(beschrijvingBtn);
+            tr.appendChild(tdBeschrijving);
+
             /* Status */
             const tdStatus  = document.createElement("td");
             const statusEl  = document.createElement("span");
@@ -848,6 +914,146 @@
         document.getElementById("addProductModal").classList.remove("show");
         document.getElementById("addProductForm").reset();
         document.getElementById("productStock").value = "5";
+    }
+
+    function openDescriptionModal(productId) {
+        const product = alleProducten.find(function(item) { return item.id === productId; });
+        if (!product) return;
+        const form = document.getElementById("descriptionForm");
+        form.dataset.productId = product.id;
+        document.getElementById("descriptionModalTitle").textContent = "Omschrijving: " + product.name;
+        document.getElementById("descriptionInput").value = product.details || "";
+        document.getElementById("descriptionPrice").value = product.price === null ? "" : product.price;
+        document.getElementById("descriptionModal").classList.add("show");
+        document.getElementById("descriptionInput").focus();
+    }
+
+    function closeDescriptionModal() {
+        document.getElementById("descriptionModal").classList.remove("show");
+    }
+
+    async function slaOmschrijvingOp(event) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const button = form.querySelector("button[type='submit']");
+        const details = document.getElementById("descriptionInput").value.trim();
+        const rawPrice = document.getElementById("descriptionPrice").value;
+        const price = rawPrice === "" ? null : Number(rawPrice);
+        if (!details) return;
+        if (price !== null && (!Number.isFinite(price) || price < 0)) {
+            alert("Vul een geldige prijs in.");
+            return;
+        }
+        button.disabled = true;
+
+        try {
+            const response = await fetch("/api/products/update_product.php", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: Number(form.dataset.productId), details: details, price: price })
+            });
+            const result = await response.json();
+            if (!result.success) {
+                alert(result.message || "Omschrijving opslaan is mislukt.");
+                return;
+            }
+            const product = alleProducten.find(function(item) { return item.id === Number(form.dataset.productId); });
+            if (product) {
+                product.details = details;
+                product.price = price;
+            }
+            closeDescriptionModal();
+        } catch (error) {
+            alert("Omschrijving opslaan is mislukt. Probeer het opnieuw.");
+        } finally {
+            button.disabled = false;
+        }
+    }
+
+    async function laadVragen() {
+        const list = document.getElementById("questionList");
+        list.replaceChildren();
+        const loading = document.createElement("div");
+        loading.className = "question-empty";
+        loading.textContent = "Vragen laden...";
+        list.appendChild(loading);
+
+        try {
+            const response = await fetch("/api/products/get_questions.php", { credentials: "same-origin" });
+            const result = await response.json();
+            if (!result.success) throw new Error(result.message || "Vragen konden niet geladen worden.");
+            list.replaceChildren();
+            if (!result.questions.length) {
+                const empty = document.createElement("div");
+                empty.className = "question-empty";
+                empty.textContent = "Er zijn nog geen klantvragen.";
+                list.appendChild(empty);
+                return;
+            }
+
+            result.questions.forEach(function(question) {
+                const card = document.createElement("article");
+                card.className = "question-card";
+                const title = document.createElement("strong");
+                title.textContent = question.product_name;
+                const meta = document.createElement("p");
+                meta.className = "question-meta";
+                meta.textContent = question.customer_name + " · " + question.customer_email + " · " + question.created_at;
+                const body = document.createElement("p");
+                body.textContent = question.question;
+                const answer = document.createElement("textarea");
+                answer.className = "question-answer";
+                answer.maxLength = 4000;
+                answer.placeholder = "Schrijf een antwoord...";
+                answer.value = question.answer || "";
+                const footer = document.createElement("div");
+                footer.className = "question-card-footer";
+                const save = document.createElement("button");
+                save.type = "button";
+                save.className = "btn btn-dark";
+                save.textContent = question.answer ? "Antwoord bijwerken" : "Antwoord opslaan";
+                const status = document.createElement("span");
+                status.className = "question-card-status";
+                save.addEventListener("click", function() {
+                    beantwoordVraag(question.id, answer, status, save);
+                });
+                footer.append(save, status);
+                card.append(title, meta, body, answer, footer);
+                list.appendChild(card);
+            });
+        } catch (error) {
+            list.replaceChildren();
+            const message = document.createElement("div");
+            message.className = "question-empty";
+            message.textContent = error.message || "Vragen konden niet geladen worden.";
+            list.appendChild(message);
+        }
+    }
+
+    async function beantwoordVraag(questionId, answerInput, status, button) {
+        const answer = answerInput.value.trim();
+        if (!answer) {
+            status.textContent = "Vul eerst een antwoord in.";
+            return;
+        }
+        button.disabled = true;
+        status.textContent = "Opslaan...";
+        try {
+            const response = await fetch("/api/products/answer_question.php", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: questionId, answer: answer })
+            });
+            const result = await response.json();
+            status.textContent = result.success ? "Antwoord opgeslagen" : (result.message || "Opslaan mislukt.");
+            if (result.success) button.textContent = "Antwoord bijwerken";
+        } catch (error) {
+            status.textContent = "Geen verbinding. Probeer opnieuw.";
+        } finally {
+            button.disabled = false;
+        }
     }
 
     async function verwijderProduct(productId) {
@@ -1000,6 +1206,8 @@
         window.location.replace("login.html");
     });
 
+    document.getElementById("descriptionForm").addEventListener("submit", slaOmschrijvingOp);
+
     document.getElementById("addProductForm").addEventListener("submit", async function(event) {
         event.preventDefault();
 
@@ -1010,6 +1218,7 @@
             category:   (formData.get("category") || "").toString().trim(),
             color:      (formData.get("color") || "").toString().trim(),
             details:    (formData.get("details") || "").toString().trim(),
+            price:      (formData.get("price") || "").toString().trim() || null,
             stock:      Math.max(0, parseInt(formData.get("stock") || "0", 10) || 0),
             image_path: (formData.get("image_path") || "placeholder-product.jpg").toString().trim() || "placeholder-product.jpg"
         };
@@ -1046,7 +1255,7 @@
     let alleProducten = [];
     (async function() {
         const toegang = await checkToegang();
-        if (toegang) await laadProducten();
+        if (toegang) await Promise.all([laadProducten(), laadVragen()]);
     })();
 
 </script>

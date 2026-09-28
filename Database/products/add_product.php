@@ -24,10 +24,18 @@ $color       = trim((string) ($input['color'] ?? ''));
 $details     = trim((string) ($input['details'] ?? ''));
 $imagePath   = trim((string) ($input['image_path'] ?? ''));
 $stock       = max(0, (int) ($input['stock'] ?? 0));
+$priceInput  = $input['price'] ?? null;
+$price       = $priceInput === null || $priceInput === '' ? null : trim((string) $priceInput);
 
 if ($name === '' || $category === '' || $color === '' || $details === '') {
     http_response_code(422);
     echo json_encode(['success' => false, 'message' => 'Vul alle verplichte velden in.']);
+    exit;
+}
+
+if ($price !== null && (!is_numeric($price) || (float) $price < 0 || (float) $price > 99999999.99)) {
+    http_response_code(422);
+    echo json_encode(['success' => false, 'message' => 'Vul een geldige prijs in.']);
     exit;
 }
 
@@ -36,8 +44,8 @@ if ($imagePath === '') {
 }
 
 $stmt = $pdo->prepare('
-    INSERT INTO products (image_path, name, category, color, details, stock, is_available)
-    VALUES (:image_path, :name, :category, :color, :details, :stock, 1)
+    INSERT INTO products (image_path, name, category, color, details, price, stock, is_available)
+    VALUES (:image_path, :name, :category, :color, :details, :price, :stock, 1)
 ');
 
 $stmt->execute([
@@ -46,6 +54,7 @@ $stmt->execute([
     'category' => $category,
     'color' => $color,
     'details' => $details,
+    'price' => $price,
     'stock' => $stock,
 ]);
 
