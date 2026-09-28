@@ -62,6 +62,15 @@ let gapaProducts = [
     [53, "eastpackrugzakpaarsdonker.jpg",                          "Eastpak rugzak",                      "tassen",  "paars",  "Rugzak met voorvak, diepe paarse stof"],
     [54, "eastpackrugzakblauwfel.jpg",                             "Eastpak rugzak",                      "tassen",  "blauw",  "Rugzak met voorvak, heldere blauwe stof"],
     [55, "eastpackrugzakgrijscharcoalkoel.jpg",                    "Eastpak rugzak",                      "tassen",  "grijs",  "Rugzak met voorvak, grijze stof"],
+    [56, "aviatorzonnebrilzwart.jpg",                              "Aviator zonnebril met vierkante glazen", "brillen", "zwart", "Vierkante glazen in donkerzwart. Aviator-model met een moderne stijl."],
+    [57, "aviatorklassiekbril.jpg",                                 "Klassieke aviator zonnebril",          "brillen", "grijs", "Klassiek aviator-model met grijze glazen."],
+    [58, "luxuryaviatorgoud.jpg",                                   "Oversized luxury aviator zonnebril",   "brillen", "goud / rozegoud", "Oversized navigator/luxury aviator met donkergrijze glazen en goud- of rozegoudkleurig montuur. Stijl: luxe en vintage."],
+    [59, "zwartglanzendzonnebril.jpg",                              "Wayfarer zonnebril zwart",             "brillen", "zwart", "Vierkant wayfarer-model, volledig uitgevoerd in glanzend zwart met donkerzwarte glazen. Stijl: modern."],
+    [60, "retrozonnebrilcremewit.jpg",                              "Ovale retro zonnebril cremewit",       "brillen", "cremewit", "Ovaal model met donkerzwarte glazen en een cremewit montuur. Stijl: retro."],
+    [61, "ovalretrozonnebrilvintage.jpg",                           "Ovale retro zonnebril ivoor",          "brillen", "wit / ivoor", "Ovaal retro-model met wit/ivoorkleurig montuur, zwarte glazen en lichtgele accenten aan de binnenzijde van de pootjes. Stijl: retro, vintage en streetwear."],
+    [62, "rectanglezonderbrilzwart.jpg",                            "Smalle rechthoekige zonnebril",        "brillen", "zwart", "Smal rechthoekig model met glanzend zwart montuur en bruin-roze getinte glazen. Stijl: retro, Y2K, streetwear en fashion."],
+    [63, "zonnebrilzwartcasual.jpg",                                "Geometrische vierkante zonnebril",     "brillen", "zwart", "Geometrisch vierkant model met hoogglans zwart montuur en donkerblauw/grijze glazen. Stijl: modern en premium."],
+    [64, "rimlesszonnebrilzwart.jpg",                               "Rimless ovale zonnebril",              "brillen", "wijnrood", "Ovaal rimless-model met wijnrood montuur en donkergroene tot groen-zwarte glazen. Stijl: vintage, Y2K, luxe en retro."],
 ].map(function(item) {
     return {
         id:       item[0],
@@ -497,8 +506,8 @@ function gapaSetOptions(select, options, allLabel) {
 }
 
 function gapaPrepareFilters() {
-    gapaSetOptions(document.getElementById("categoryFilter"), ["kleding", "tassen"], "Alle categorie\u00ebn");
-    gapaSetOptions(document.getElementById("typeFilter"),     ["kleding", "tassen"], "Alle categorie\u00ebn");
+    gapaSetOptions(document.getElementById("categoryFilter"), ["kleding", "tassen", "brillen"], "Alle categorie\u00ebn");
+    gapaSetOptions(document.getElementById("typeFilter"),     ["kleding", "tassen", "brillen"], "Alle categorie\u00ebn");
     gapaSetOptions(document.getElementById("colorFilter"),    gapaColors,            "Alle kleuren");
 
     const styleFilter = document.getElementById("styleFilter");

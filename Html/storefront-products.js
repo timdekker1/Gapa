@@ -20,37 +20,41 @@
         const data = await response.json();
         if (!data.success || !Array.isArray(data.products)) throw new Error("Producten konden niet geladen worden.");
 
-        const byImage = new Map(data.products.map(function(product) {
-            return [product.image_path.toLowerCase(), product];
-        }));
+        const featuredProducts = data.products.slice(-cards.length).reverse();
 
-        cards.forEach(function(card) {
+        cards.forEach(function(card, index) {
+            const product = featuredProducts[index];
+            if (!product) return;
             const image = card.querySelector(".product-image img");
             if (!image) return;
-            const imagePath = new URL(image.getAttribute("src"), document.baseURI).pathname.split("/").pop().toLowerCase();
-            const product = byImage.get(imagePath);
-            if (!product) return;
 
             card.dataset.productId = product.id;
             card.dataset.price = product.price === null ? "" : product.price;
+            image.src = "/" + product.image_path;
             image.alt = product.name + ": " + product.details;
             image.style.cursor = "pointer";
 
-            const imageLink = document.createElement("a");
+            let imageLink = image.parentElement;
+            if (imageLink.tagName !== "A") {
+                imageLink = document.createElement("a");
+                image.parentNode.insertBefore(imageLink, image);
+                imageLink.appendChild(image);
+            }
             imageLink.href = "/Html/product.html?id=" + encodeURIComponent(product.id);
             imageLink.setAttribute("aria-label", "Bekijk " + product.name);
             imageLink.style.cssText = "display:block;width:100%;height:100%;";
-            image.parentNode.insertBefore(imageLink, image);
-            imageLink.appendChild(image);
 
             const info = card.querySelector(".product-info");
             if (!info) return;
             const name = info.querySelector(".product-name");
             if (name) name.textContent = product.name;
+            card.dataset.name = product.name;
+            card.dataset.category = product.category;
+            card.dataset.color = product.color;
 
             const descriptions = info.querySelectorAll(".product-description");
             if (descriptions.length) {
-                descriptions[0].textContent = product.category + " · " + product.color;
+                descriptions[0].textContent = product.category.charAt(0).toUpperCase() + product.category.slice(1) + " · " + product.color;
             }
 
             const price = info.querySelector(".product-price");

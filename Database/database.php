@@ -156,6 +156,36 @@ try {
         }
     }
 
+    $brillen = [
+        ['aviatorzonnebrilzwart.jpg', 'Aviator zonnebril met vierkante glazen', 'brillen', 'zwart', 'Vierkante glazen in donkerzwart. Aviator-model met een moderne stijl.'],
+        ['aviatorklassiekbril.jpg', 'Klassieke aviator zonnebril', 'brillen', 'grijs', 'Klassiek aviator-model met grijze glazen.'],
+        ['luxuryaviatorgoud.jpg', 'Oversized luxury aviator zonnebril', 'brillen', 'goud / rozegoud', 'Oversized navigator/luxury aviator met donkergrijze glazen en goud- of rozegoudkleurig montuur. Stijl: luxe en vintage.'],
+        ['zwartglanzendzonnebril.jpg', 'Wayfarer zonnebril zwart', 'brillen', 'zwart', 'Vierkant wayfarer-model, volledig uitgevoerd in glanzend zwart met donkerzwarte glazen. Stijl: modern.'],
+        ['retrozonnebrilcremewit.jpg', 'Ovale retro zonnebril cremewit', 'brillen', 'cremewit', 'Ovaal model met donkerzwarte glazen en een cremewit montuur. Stijl: retro.'],
+        ['ovalretrozonnebrilvintage.jpg', 'Ovale retro zonnebril ivoor', 'brillen', 'wit / ivoor', 'Ovaal retro-model met wit/ivoorkleurig montuur, zwarte glazen en lichtgele accenten aan de binnenzijde van de pootjes. Stijl: retro, vintage en streetwear.'],
+        ['rectanglezonderbrilzwart.jpg', 'Smalle rechthoekige zonnebril', 'brillen', 'zwart', 'Smal rechthoekig model met glanzend zwart montuur en bruin-roze getinte glazen. Stijl: retro, Y2K, streetwear en fashion.'],
+        ['zonnebrilzwartcasual.jpg', 'Geometrische vierkante zonnebril', 'brillen', 'zwart', 'Geometrisch vierkant model met hoogglans zwart montuur en donkerblauw/grijze glazen. Stijl: modern en premium.'],
+        ['rimlesszonnebrilzwart.jpg', 'Rimless ovale zonnebril', 'brillen', 'wijnrood', 'Ovaal rimless-model met wijnrood montuur en donkergroene tot groen-zwarte glazen. Stijl: vintage, Y2K, luxe en retro.'],
+    ];
+    $brilBestaat = $pdo->prepare('SELECT id FROM products WHERE image_path = :image_path LIMIT 1');
+    $brilToevoegen = $pdo->prepare('
+        INSERT INTO products (image_path, name, category, color, details, stock, is_available)
+        VALUES (:image_path, :name, :category, :color, :details, 5, 1)
+    ');
+    foreach ($brillen as $bril) {
+        $brilBestaat->execute(['image_path' => $bril[0]]);
+        if ($brilBestaat->fetchColumn()) {
+            continue;
+        }
+        $brilToevoegen->execute([
+            'image_path' => $bril[0],
+            'name' => $bril[1],
+            'category' => $bril[2],
+            'color' => $bril[3],
+            'details' => $bril[4],
+        ]);
+    }
+
 } catch (PDOException $e) {
     http_response_code(500);
     die(json_encode(['success' => false, 'message' => 'Databaseverbinding mislukt.']));
